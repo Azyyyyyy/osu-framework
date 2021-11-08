@@ -6,7 +6,7 @@ using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.StateChanges;
 using osu.Framework.Testing;
-using osuTK.Input;
+using Silk.NET.Input;
 
 namespace osu.Framework.Tests.Visual.Input
 {

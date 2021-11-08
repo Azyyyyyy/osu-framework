@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Runtime.InteropServices;
 using JetBrains.Annotations;
 using osu.Framework.Bindables;
@@ -15,9 +16,9 @@ using osu.Framework.Input;
 using osu.Framework.Platform.SDL2;
 using osu.Framework.Platform.Windows.Native;
 using osu.Framework.Threading;
-using osuTK;
-using osuTK.Input;
-using SDL2;
+using Silk.NET.Input;
+using Silk.NET.Maths;
+using Silk.NET.SDL;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using Image = SixLabors.ImageSharp.Image;
@@ -33,10 +34,10 @@ namespace osu.Framework.Platform
     /// <summary>
     /// Default implementation of a desktop window, using SDL for windowing and graphics support.
     /// </summary>
-    public class SDL2DesktopWindow : IWindow
+    public unsafe class SDL2DesktopWindow : IWindow
     {
-        internal IntPtr SDLWindowHandle { get; private set; } = IntPtr.Zero;
-
+        protected Window* WindowPtr;
+        private readonly Sdl sdl;
         private readonly IGraphicsBackend graphicsBackend;
 
         private bool focused;
@@ -89,7 +90,7 @@ namespace osu.Framework.Platform
             set
             {
                 position = value;
-                ScheduleCommand(() => SDL.SDL_SetWindowPosition(SDLWindowHandle, value.X, value.Y));
+                ScheduleCommand(() => sdl.SetWindowPosition(WindowPtr, value.X, value.Y));
             }
         }
 
@@ -107,7 +108,7 @@ namespace osu.Framework.Platform
                     return;
 
                 resizable = value;
-                ScheduleCommand(() => SDL.SDL_SetWindowResizable(SDLWindowHandle, value ? SDL.SDL_bool.SDL_TRUE : SDL.SDL_bool.SDL_FALSE));
+                ScheduleCommand(() => sdl.SetWindowResizable(WindowPtr, value ? SdlBool.True : SdlBool.False));
             }
         }
 
@@ -126,11 +127,11 @@ namespace osu.Framework.Platform
                 if (relativeMouseMode == value)
                     return;
 
-                if (value && !CursorState.HasFlagFast(CursorState.Hidden))
+                if (value && !CursorState.HasFlagFast(CursorMode.Hidden))
                     throw new InvalidOperationException($"Cannot set {nameof(RelativeMouseMode)} to true when the cursor is not hidden via {nameof(CursorState)}.");
 
                 relativeMouseMode = value;
-                ScheduleCommand(() => SDL.SDL_SetRelativeMouseMode(value ? SDL.SDL_bool.SDL_TRUE : SDL.SDL_bool.SDL_FALSE));
+                ScheduleCommand(() => sdl.SetRelativeMouseMode(value ? SdlBool.True : SdlBool.False));
             }
         }
 
@@ -154,9 +155,9 @@ namespace osu.Framework.Platform
         /// <summary>
         /// Provides a bindable that controls the window's <see cref="CursorStateBindable"/>.
         /// </summary>
-        public Bindable<CursorState> CursorStateBindable { get; } = new Bindable<CursorState>();
+        public Bindable<CursorMode> CursorStateBindable { get; } = new Bindable<CursorMode>();
 
-        public CursorState CursorState
+        public CursorMode CursorState
         {
             get => CursorStateBindable.Value;
             set => CursorStateBindable.Value = value;
@@ -203,7 +204,7 @@ namespace osu.Framework.Platform
             set
             {
                 title = value;
-                ScheduleCommand(() => SDL.SDL_SetWindowTitle(SDLWindowHandle, title));
+                ScheduleCommand(() => sdl.SetWindowTitle(WindowPtr, title));
             }
         }
 
@@ -221,18 +222,18 @@ namespace osu.Framework.Platform
                 ScheduleCommand(() =>
                 {
                     if (value)
-                        SDL.SDL_ShowWindow(SDLWindowHandle);
+                        sdl.ShowWindow(WindowPtr);
                     else
-                        SDL.SDL_HideWindow(SDLWindowHandle);
+                        sdl.HideWindow(WindowPtr);
                 });
             }
         }
 
         private void updateCursorVisibility(bool visible) =>
-            ScheduleCommand(() => SDL.SDL_ShowCursor(visible ? SDL.SDL_ENABLE : SDL.SDL_DISABLE));
+            ScheduleCommand(() => sdl.ShowCursor(visible ? 1 : 0));
 
         private void updateCursorConfined(bool confined) =>
-            ScheduleCommand(() => SDL.SDL_SetWindowGrab(SDLWindowHandle, confined ? SDL.SDL_bool.SDL_TRUE : SDL.SDL_bool.SDL_FALSE));
+            ScheduleCommand(() => sdl.SetWindowGrab(WindowPtr, confined ? SdlBool.True : SdlBool.False));
 
         private WindowState windowState = WindowState.Normal;
 
@@ -269,7 +270,7 @@ namespace osu.Framework.Platform
         /// <summary>
         /// Queries the physical displays and their supported resolutions.
         /// </summary>
-        public IEnumerable<Display> Displays => Enumerable.Range(0, SDL.SDL_GetNumVideoDisplays()).Select(displayFromSDL);
+        public IEnumerable<Display> Displays => Enumerable.Range(0, sdl.GetNumVideoDisplays()).Select(displayFromSDL);
 
         /// <summary>
         /// Gets the <see cref="Display"/> that has been set as "primary" or "default" in the operating system.
@@ -300,49 +301,34 @@ namespace osu.Framework.Platform
         {
             get
             {
-                if (SDLWindowHandle == IntPtr.Zero)
+                if ((IntPtr)WindowPtr == IntPtr.Zero)
                     return IntPtr.Zero;
 
                 var wmInfo = getWindowWMInfo();
 
                 // Window handle is selected per subsystem as defined at:
                 // https://wiki.libsdl.org/SDL_SysWMinfo
-                switch (wmInfo.subsystem)
+                return wmInfo.Subsystem switch
                 {
-                    case SDL.SDL_SYSWM_TYPE.SDL_SYSWM_WINDOWS:
-                        return wmInfo.info.win.window;
-
-                    case SDL.SDL_SYSWM_TYPE.SDL_SYSWM_X11:
-                        return wmInfo.info.x11.window;
-
-                    case SDL.SDL_SYSWM_TYPE.SDL_SYSWM_DIRECTFB:
-                        return wmInfo.info.dfb.window;
-
-                    case SDL.SDL_SYSWM_TYPE.SDL_SYSWM_COCOA:
-                        return wmInfo.info.cocoa.window;
-
-                    case SDL.SDL_SYSWM_TYPE.SDL_SYSWM_UIKIT:
-                        return wmInfo.info.uikit.window;
-
-                    case SDL.SDL_SYSWM_TYPE.SDL_SYSWM_WAYLAND:
-                        return wmInfo.info.wl.shell_surface;
-
-                    case SDL.SDL_SYSWM_TYPE.SDL_SYSWM_ANDROID:
-                        return wmInfo.info.android.window;
-
-                    default:
-                        return IntPtr.Zero;
-                }
+                    SysWMType.Windows => wmInfo.Info.Win.Hwnd,
+                    SysWMType.X11 => (IntPtr)wmInfo.Info.X11.Window,
+                    SysWMType.DirectFB => (IntPtr)wmInfo.Info.Dummy,
+                    SysWMType.Cocoa => (IntPtr)wmInfo.Info.Cocoa.Window,
+                    SysWMType.UIKit => (IntPtr)wmInfo.Info.UIKit.Window,
+                    SysWMType.Wayland => (IntPtr)wmInfo.Info.Wayland.Display,
+                    SysWMType.Android => (IntPtr)wmInfo.Info.Android.Window,
+                    _ => IntPtr.Zero
+                };
             }
         }
 
-        private SDL.SDL_SysWMinfo getWindowWMInfo()
+        private SysWMInfo getWindowWMInfo()
         {
-            if (SDLWindowHandle == IntPtr.Zero)
+            if ((IntPtr)WindowPtr == IntPtr.Zero)
                 return default;
 
-            var wmInfo = new SDL.SDL_SysWMinfo();
-            SDL.SDL_GetWindowWMInfo(SDLWindowHandle, ref wmInfo);
+            var wmInfo = new SysWMInfo();
+            sdl.GetWindowWMInfo(WindowPtr, &wmInfo);
             return wmInfo;
         }
 
@@ -350,12 +336,13 @@ namespace osu.Framework.Platform
         {
             get
             {
-                SDL.SDL_GetDisplayBounds(displayIndex, out var rect);
-                return new Rectangle(rect.x, rect.y, rect.w, rect.h);
+                var rec = new Rectangle<int>();
+                sdl.GetDisplayBounds(displayIndex, ref rec);
+                return new Rectangle(rec.Origin.X, rec.Origin.Y, rec.Size.X, rec.Size.Y);
             }
         }
 
-        public bool CapsLockPressed => SDL.SDL_GetModState().HasFlagFast(SDL.SDL_Keymod.KMOD_CAPS);
+        public bool CapsLockPressed => sdl.GetModState().HasFlagFast(Keymod.KmodCaps);
 
         private bool firstDraw = true;
 
@@ -363,11 +350,12 @@ namespace osu.Framework.Platform
         private readonly BindableSize sizeWindowed = new BindableSize();
         private readonly BindableDouble windowPositionX = new BindableDouble();
         private readonly BindableDouble windowPositionY = new BindableDouble();
-        private readonly Bindable<DisplayIndex> windowDisplayIndexBindable = new Bindable<DisplayIndex>();
+        private readonly Bindable<Display> windowDisplayIndexBindable = new Bindable<Display>();
 
         public SDL2DesktopWindow()
         {
-            SDL.SDL_Init(SDL.SDL_INIT_VIDEO | SDL.SDL_INIT_GAMECONTROLLER);
+            SdlProvider.InitFlags = Sdl.InitVideo | Sdl.InitGamecontroller;
+            sdl = SdlProvider.SDL.Value;
 
             graphicsBackend = CreateGraphicsBackend();
 
@@ -375,8 +363,8 @@ namespace osu.Framework.Platform
 
             CursorStateBindable.ValueChanged += evt =>
             {
-                updateCursorVisibility(!evt.NewValue.HasFlagFast(CursorState.Hidden));
-                updateCursorConfined(evt.NewValue.HasFlagFast(CursorState.Confined));
+                updateCursorVisibility(!evt.NewValue.HasFlagFast(CursorMode.Hidden));
+                updateCursorConfined(evt.NewValue.HasFlagFast(CursorMode.Raw));
             };
 
             populateJoysticks();
@@ -387,21 +375,25 @@ namespace osu.Framework.Platform
         /// </summary>
         public virtual void Create()
         {
-            SDL.SDL_WindowFlags flags = SDL.SDL_WindowFlags.SDL_WINDOW_OPENGL |
-                                        SDL.SDL_WindowFlags.SDL_WINDOW_RESIZABLE |
-                                        SDL.SDL_WindowFlags.SDL_WINDOW_ALLOW_HIGHDPI |
-                                        SDL.SDL_WindowFlags.SDL_WINDOW_HIDDEN | // shown after first swap to avoid white flash on startup (windows)
-                                        WindowState.ToFlags();
+            WindowFlags flags = WindowFlags.WindowOpengl |
+                                WindowFlags.WindowResizable |
+                                WindowFlags.WindowAllowHighdpi |
+                                WindowFlags.WindowHidden | // shown after first swap to avoid white flash on startup (windows)
+                                WindowState.ToFlags();
 
-            SDL.SDL_SetHint(SDL.SDL_HINT_WINDOWS_NO_CLOSE_ON_ALT_F4, "1");
-            SDL.SDL_SetHint(SDL.SDL_HINT_VIDEO_MINIMIZE_ON_FOCUS_LOSS, "1");
-
-            SDLWindowHandle = SDL.SDL_CreateWindow(title, Position.X, Position.Y, Size.Width, Size.Height, flags);
+            sdl.SetHint(Sdl.HintWindowsNoCloseOnAltF4, "1");
+            sdl.SetHint(Sdl.HintVideoMinimizeOnFocusLoss, "1");
+            WindowPtr = sdl.CreateWindow(title, Position.X, Position.Y, Size.Width, Size.Height, (uint)flags);
 
             Exists = true;
 
             MouseEntered += () => cursorInWindow.Value = true;
             MouseLeft += () => cursorInWindow.Value = false;
+
+            if (graphicsBackend is SDL2GraphicsBackend sdl2GraphicsBackend)
+            {
+                sdl2GraphicsBackend.SetWindow(WindowPtr);
+            }
 
             graphicsBackend.Initialise(this);
 
@@ -412,7 +404,7 @@ namespace osu.Framework.Platform
 
         // reference must be kept to avoid GC, see https://stackoverflow.com/a/6193914
         [UsedImplicitly]
-        private SDL.SDL_EventFilter eventFilterDelegate;
+        private EventFilter eventFilterDelegate;
 
         /// <summary>
         /// Starts the window's run loop.
@@ -420,18 +412,18 @@ namespace osu.Framework.Platform
         public void Run()
         {
             // polling via SDL_PollEvent blocks on resizes (https://stackoverflow.com/a/50858339)
-            SDL.SDL_SetEventFilter(eventFilterDelegate = (_, eventPtr) =>
+            sdl.SetEventFilter(eventFilterDelegate = (_, eventPtr) =>
             {
                 // ReSharper disable once PossibleNullReferenceException
-                var e = (SDL.SDL_Event)Marshal.PtrToStructure(eventPtr, typeof(SDL.SDL_Event));
+                var e = *eventPtr;
 
-                if (e.type == SDL.SDL_EventType.SDL_WINDOWEVENT && e.window.windowEvent == SDL.SDL_WindowEventID.SDL_WINDOWEVENT_RESIZED)
+                if (e.Type == (uint)EventType.Windowevent && e.Window.Event == (byte)WindowEventID.WindoweventResized)
                 {
                     updateWindowSize();
                 }
 
                 return 1;
-            }, IntPtr.Zero);
+            }, (void*)0);
 
             while (Exists)
             {
@@ -455,10 +447,10 @@ namespace osu.Framework.Platform
 
             Exited?.Invoke();
 
-            if (SDLWindowHandle != IntPtr.Zero)
-                SDL.SDL_DestroyWindow(SDLWindowHandle);
+            if ((IntPtr)WindowPtr != IntPtr.Zero)
+                sdl.DestroyWindow(WindowPtr);
 
-            SDL.SDL_Quit();
+            sdl.Quit();
         }
 
         /// <summary>
@@ -467,8 +459,12 @@ namespace osu.Framework.Platform
         /// <returns>Whether the window size has been changed after updating.</returns>
         private void updateWindowSize()
         {
-            SDL.SDL_GL_GetDrawableSize(SDLWindowHandle, out int w, out int h);
-            SDL.SDL_GetWindowSize(SDLWindowHandle, out int actualW, out int _);
+            int w;
+            int h;
+            int actualW;
+            int tmp;
+            sdl.GLGetDrawableSize(WindowPtr, &w, &h);
+            sdl.GetWindowSize(WindowPtr, &actualW, &tmp);
 
             Scale = (float)w / actualW;
             Size = new Size(w, h);
@@ -533,7 +529,7 @@ namespace osu.Framework.Platform
         /// Attempts to set the window's icon to the specified image.
         /// </summary>
         /// <param name="image">An <see cref="Image{Rgba32}"/> to set as the window icon.</param>
-        private unsafe void setSDLIcon(Image<Rgba32> image)
+        private void setSDLIcon(Image<Rgba32> image)
         {
             var pixelMemory = image.CreateReadOnlyPixelMemory();
             var imageSize = image.Size();
@@ -542,12 +538,12 @@ namespace osu.Framework.Platform
             {
                 var pixelSpan = pixelMemory.Span;
 
-                IntPtr surface;
-                fixed (Rgba32* ptr = pixelSpan)
-                    surface = SDL.SDL_CreateRGBSurfaceFrom(new IntPtr(ptr), imageSize.Width, imageSize.Height, 32, imageSize.Width * 4, 0xff, 0xff00, 0xff0000, 0xff000000);
+                Surface* surface;
+                fixed (void* ptr = pixelSpan)
+                    surface = sdl.CreateRGBSurfaceFrom(ptr, imageSize.Width, imageSize.Height, 32, imageSize.Width * 4, 0xff, 0xff00, 0xff0000, 0xff000000);
 
-                SDL.SDL_SetWindowIcon(SDLWindowHandle, surface);
-                SDL.SDL_FreeSurface(surface);
+                sdl.SetWindowIcon(WindowPtr, surface);
+                sdl.FreeSurface(surface);
             });
         }
 
@@ -555,7 +551,9 @@ namespace osu.Framework.Platform
 
         private void pollMouse()
         {
-            SDL.SDL_GetGlobalMouseState(out int x, out int y);
+            int x = 0;
+            int y = 0;
+            sdl.GetGlobalMouseState(ref x, ref y);
             if (previousPolledPoint.X == x && previousPolledPoint.Y == y)
                 return;
 
@@ -579,128 +577,131 @@ namespace osu.Framework.Platform
         protected void ScheduleCommand(Action action) => commandScheduler.Add(action, false);
 
         private const int events_per_peep = 64;
-        private readonly SDL.SDL_Event[] events = new SDL.SDL_Event[events_per_peep];
+        private readonly Event[] events = new Event[events_per_peep];
 
         /// <summary>
         /// Poll for all pending events.
         /// </summary>
         private void pollSDLEvents()
         {
-            SDL.SDL_PumpEvents();
-
             int eventsRead;
 
             do
             {
-                eventsRead = SDL.SDL_PeepEvents(events, events_per_peep, SDL.SDL_eventaction.SDL_GETEVENT, SDL.SDL_EventType.SDL_FIRSTEVENT, SDL.SDL_EventType.SDL_LASTEVENT);
+                fixed (Event* evn = events)
+                {
+                    eventsRead = sdl.PollEvent(evn);
+                }
+
                 for (int i = 0; i < eventsRead; i++)
                     handleSDLEvent(events[i]);
             } while (eventsRead == events_per_peep);
         }
 
-        private void handleSDLEvent(SDL.SDL_Event e)
+        private void handleSDLEvent(Event e)
         {
-            switch (e.type)
+            switch ((EventType)e.Type)
             {
-                case SDL.SDL_EventType.SDL_QUIT:
-                case SDL.SDL_EventType.SDL_APP_TERMINATING:
-                    handleQuitEvent(e.quit);
+                case EventType.Quit:
+                case EventType.AppTerminating:
+                    handleQuitEvent(e.Quit);
                     break;
 
-                case SDL.SDL_EventType.SDL_WINDOWEVENT:
-                    handleWindowEvent(e.window);
+                case EventType.Windowevent:
+                    handleWindowEvent(e.Window);
                     break;
 
-                case SDL.SDL_EventType.SDL_KEYDOWN:
-                case SDL.SDL_EventType.SDL_KEYUP:
-                    handleKeyboardEvent(e.key);
+                case EventType.Keydown:
+                case EventType.Keyup:
+                    handleKeyboardEvent(e.Key);
                     break;
 
-                case SDL.SDL_EventType.SDL_TEXTEDITING:
-                    handleTextEditingEvent(e.edit);
+                case EventType.Textediting:
+                    handleTextEditingEvent(e.Edit);
                     break;
 
-                case SDL.SDL_EventType.SDL_TEXTINPUT:
-                    handleTextInputEvent(e.text);
+                case EventType.Textinput:
+                    handleTextInputEvent(e.Text);
                     break;
 
-                case SDL.SDL_EventType.SDL_KEYMAPCHANGED:
+                case EventType.Mousemotion:
+                    handleMouseMotionEvent(e.Motion);
+                    break;
+
+                case EventType.Keymapchanged:
                     handleKeymapChangedEvent();
                     break;
 
-                case SDL.SDL_EventType.SDL_MOUSEMOTION:
-                    handleMouseMotionEvent(e.motion);
+                case EventType.Mousebuttondown:
+                case EventType.Mousebuttonup:
+                    handleMouseButtonEvent(e.Button);
                     break;
 
-                case SDL.SDL_EventType.SDL_MOUSEBUTTONDOWN:
-                case SDL.SDL_EventType.SDL_MOUSEBUTTONUP:
-                    handleMouseButtonEvent(e.button);
+                case EventType.Mousewheel:
+                    handleMouseWheelEvent(e.Wheel);
                     break;
 
-                case SDL.SDL_EventType.SDL_MOUSEWHEEL:
-                    handleMouseWheelEvent(e.wheel);
+                case EventType.Joyaxismotion:
+                    handleJoyAxisEvent(e.Jaxis);
                     break;
 
-                case SDL.SDL_EventType.SDL_JOYAXISMOTION:
-                    handleJoyAxisEvent(e.jaxis);
+                case EventType.Joyballmotion:
+                    handleJoyBallEvent(e.Jball);
                     break;
 
-                case SDL.SDL_EventType.SDL_JOYBALLMOTION:
-                    handleJoyBallEvent(e.jball);
+                case EventType.Joyhatmotion:
+                    handleJoyHatEvent(e.Jhat);
                     break;
 
-                case SDL.SDL_EventType.SDL_JOYHATMOTION:
-                    handleJoyHatEvent(e.jhat);
+                case EventType.Joybuttondown:
+                case EventType.Joybuttonup:
+                    handleJoyButtonEvent(e.Jbutton);
                     break;
 
-                case SDL.SDL_EventType.SDL_JOYBUTTONDOWN:
-                case SDL.SDL_EventType.SDL_JOYBUTTONUP:
-                    handleJoyButtonEvent(e.jbutton);
+                case EventType.Joydeviceadded:
+                case EventType.Joydeviceremoved:
+                    handleJoyDeviceEvent(e.Jdevice);
                     break;
 
-                case SDL.SDL_EventType.SDL_JOYDEVICEADDED:
-                case SDL.SDL_EventType.SDL_JOYDEVICEREMOVED:
-                    handleJoyDeviceEvent(e.jdevice);
+                case EventType.Controlleraxismotion:
+                    handleControllerAxisEvent(e.Caxis);
                     break;
 
-                case SDL.SDL_EventType.SDL_CONTROLLERAXISMOTION:
-                    handleControllerAxisEvent(e.caxis);
+                case EventType.Controllerbuttondown:
+                case EventType.Controllerbuttonup:
+                    handleControllerButtonEvent(e.Cbutton);
                     break;
 
-                case SDL.SDL_EventType.SDL_CONTROLLERBUTTONDOWN:
-                case SDL.SDL_EventType.SDL_CONTROLLERBUTTONUP:
-                    handleControllerButtonEvent(e.cbutton);
+                case EventType.Controllerdeviceadded:
+                case EventType.Controllerdeviceremoved:
+                case EventType.Controllerdeviceremapped:
+                    handleControllerDeviceEvent(e.Cdevice);
                     break;
 
-                case SDL.SDL_EventType.SDL_CONTROLLERDEVICEADDED:
-                case SDL.SDL_EventType.SDL_CONTROLLERDEVICEREMOVED:
-                case SDL.SDL_EventType.SDL_CONTROLLERDEVICEREMAPPED:
-                    handleControllerDeviceEvent(e.cdevice);
+                case EventType.Fingerdown:
+                case EventType.Fingerup:
+                case EventType.Fingermotion:
+                    handleTouchFingerEvent(e.Tfinger);
                     break;
 
-                case SDL.SDL_EventType.SDL_FINGERDOWN:
-                case SDL.SDL_EventType.SDL_FINGERUP:
-                case SDL.SDL_EventType.SDL_FINGERMOTION:
-                    handleTouchFingerEvent(e.tfinger);
-                    break;
-
-                case SDL.SDL_EventType.SDL_DROPFILE:
-                case SDL.SDL_EventType.SDL_DROPTEXT:
-                case SDL.SDL_EventType.SDL_DROPBEGIN:
-                case SDL.SDL_EventType.SDL_DROPCOMPLETE:
-                    handleDropEvent(e.drop);
+                case EventType.Dropfile:
+                case EventType.Droptext:
+                case EventType.Dropbegin:
+                case EventType.Dropcomplete:
+                    handleDropEvent(e.Drop);
                     break;
             }
         }
 
-        private void handleQuitEvent(SDL.SDL_QuitEvent evtQuit) => RequestClose();
+        private void handleQuitEvent(QuitEvent evtQuit) => RequestClose();
 
-        private void handleDropEvent(SDL.SDL_DropEvent evtDrop)
+        private void handleDropEvent(DropEvent evtDrop)
         {
-            switch (evtDrop.type)
+            switch ((EventType)evtDrop.Type)
             {
-                case SDL.SDL_EventType.SDL_DROPFILE:
-                    string str = SDL.UTF8_ToManaged(evtDrop.file, true);
+                case EventType.Dropfile:
+                    string str = "";
+                    sdl.Utf8strlcpy(str, evtDrop.File, 1);
                     if (str != null)
                         ScheduleEvent(() => DragDrop?.Invoke(str));
 
@@ -708,65 +709,69 @@ namespace osu.Framework.Platform
             }
         }
 
-        private void handleTouchFingerEvent(SDL.SDL_TouchFingerEvent evtTfinger)
+        private void handleTouchFingerEvent(TouchFingerEvent evtTfinger)
         {
         }
 
-        private void handleControllerDeviceEvent(SDL.SDL_ControllerDeviceEvent evtCdevice)
+        private void handleControllerDeviceEvent(ControllerDeviceEvent evtCdevice)
         {
-            switch (evtCdevice.type)
+            switch ((EventType)evtCdevice.Type)
             {
-                case SDL.SDL_EventType.SDL_CONTROLLERDEVICEADDED:
-                    addJoystick(evtCdevice.which);
+                case EventType.Controllerdeviceadded:
+                    addJoystick(evtCdevice.Which);
                     break;
 
-                case SDL.SDL_EventType.SDL_CONTROLLERDEVICEREMOVED:
-                    SDL.SDL_GameControllerClose(controllers[evtCdevice.which].ControllerHandle);
-                    controllers.Remove(evtCdevice.which);
+                case EventType.Controllerdeviceremoved:
+                    var cont = (GameController)controllers[evtCdevice.Which].ControllerHandle!;
+                    sdl.GameControllerClose(&cont);
+
+                    controllers.Remove(evtCdevice.Which);
                     break;
 
-                case SDL.SDL_EventType.SDL_CONTROLLERDEVICEREMAPPED:
-                    if (controllers.TryGetValue(evtCdevice.which, out var state))
+                case EventType.Controllerdeviceremapped:
+                    if (controllers.TryGetValue(evtCdevice.Which, out var state))
                         state.PopulateBindings();
 
                     break;
             }
         }
 
-        private void handleControllerButtonEvent(SDL.SDL_ControllerButtonEvent evtCbutton)
+        private void handleControllerButtonEvent(ControllerButtonEvent evtCbutton)
         {
-            var button = ((SDL.SDL_GameControllerButton)evtCbutton.button).ToJoystickButton();
+            var button = ((GameControllerButton)evtCbutton.Button).ToJoystickButton();
 
-            switch (evtCbutton.type)
+            switch ((EventType)evtCbutton.Type)
             {
-                case SDL.SDL_EventType.SDL_CONTROLLERBUTTONDOWN:
+                case EventType.Controllerbuttondown:
                     enqueueJoystickButtonInput(button, true);
                     break;
 
-                case SDL.SDL_EventType.SDL_CONTROLLERBUTTONUP:
+                case EventType.Controllerbuttonup:
                     enqueueJoystickButtonInput(button, false);
                     break;
             }
         }
 
-        private void handleControllerAxisEvent(SDL.SDL_ControllerAxisEvent evtCaxis) =>
-            enqueueJoystickAxisInput(((SDL.SDL_GameControllerAxis)evtCaxis.axis).ToJoystickAxisSource(), evtCaxis.axisValue);
+        private void handleControllerAxisEvent(ControllerAxisEvent evtCaxis) =>
+            enqueueJoystickAxisInput(((GameControllerAxis)evtCaxis.Value).ToJoystickAxisSource(), evtCaxis.Axis);
 
         private void addJoystick(int which)
         {
-            int instanceID = SDL.SDL_JoystickGetDeviceInstanceID(which);
+            int instanceID = sdl.JoystickGetDeviceInstanceID(which);
 
             // if the joystick is already opened, ignore it
             if (controllers.ContainsKey(instanceID))
                 return;
 
-            var joystick = SDL.SDL_JoystickOpen(which);
+            var joystick = sdl.JoystickOpen(which);
 
-            var controller = IntPtr.Zero;
-            if (SDL.SDL_IsGameController(which) == SDL.SDL_bool.SDL_TRUE)
-                controller = SDL.SDL_GameControllerOpen(which);
+            if (sdl.IsGameController(which) == SdlBool.True)
+            {
+                var controller = sdl.GameControllerOpen(which);
+                controllers[instanceID] = new SDL2ControllerBindings(joystick, *controller);
+            }
 
-            controllers[instanceID] = new SDL2ControllerBindings(joystick, controller);
+            controllers[instanceID] = new SDL2ControllerBindings(joystick, null);
         }
 
         /// <summary>
@@ -774,98 +779,98 @@ namespace osu.Framework.Platform
         /// </summary>
         private void populateJoysticks()
         {
-            for (int i = 0; i < SDL.SDL_NumJoysticks(); i++)
+            for (int i = 0; i < sdl.NumJoysticks(); i++)
             {
                 addJoystick(i);
             }
         }
 
-        private void handleJoyDeviceEvent(SDL.SDL_JoyDeviceEvent evtJdevice)
+        private void handleJoyDeviceEvent(JoyDeviceEvent evtJdevice)
         {
-            switch (evtJdevice.type)
+            switch ((EventType)evtJdevice.Type)
             {
-                case SDL.SDL_EventType.SDL_JOYDEVICEADDED:
-                    addJoystick(evtJdevice.which);
+                case EventType.Joydeviceadded:
+                    addJoystick(evtJdevice.Which);
                     break;
 
-                case SDL.SDL_EventType.SDL_JOYDEVICEREMOVED:
+                case EventType.Joydeviceremoved:
                     // if the joystick is already closed, ignore it
-                    if (!controllers.ContainsKey(evtJdevice.which))
+                    if (!controllers.ContainsKey(evtJdevice.Which))
                         break;
 
-                    SDL.SDL_JoystickClose(controllers[evtJdevice.which].JoystickHandle);
-                    controllers.Remove(evtJdevice.which);
+                    sdl.JoystickClose(controllers[evtJdevice.Which].JoystickHandle);
+                    controllers.Remove(evtJdevice.Which);
                     break;
             }
         }
 
-        private void handleJoyButtonEvent(SDL.SDL_JoyButtonEvent evtJbutton)
+        private void handleJoyButtonEvent(JoyButtonEvent evtJbutton)
         {
             // if this button exists in the controller bindings, skip it
-            if (controllers.TryGetValue(evtJbutton.which, out var state) && state.GetButtonForIndex(evtJbutton.button) != SDL.SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_INVALID)
+            if (controllers.TryGetValue(evtJbutton.Which, out var state) && state.GetButtonForIndex(evtJbutton.Button) != GameControllerButton.ControllerButtonInvalid)
                 return;
 
-            var button = JoystickButton.FirstButton + evtJbutton.button;
+            var button = JoystickButton.FirstButton + evtJbutton.Button;
 
-            switch (evtJbutton.type)
+            switch ((EventType)evtJbutton.Type)
             {
-                case SDL.SDL_EventType.SDL_JOYBUTTONDOWN:
+                case EventType.Joybuttondown:
                     enqueueJoystickButtonInput(button, true);
                     break;
 
-                case SDL.SDL_EventType.SDL_JOYBUTTONUP:
+                case EventType.Joybuttonup:
                     enqueueJoystickButtonInput(button, false);
                     break;
             }
         }
 
-        private void handleJoyHatEvent(SDL.SDL_JoyHatEvent evtJhat)
+        private void handleJoyHatEvent(JoyHatEvent evtJhat)
         {
         }
 
-        private void handleJoyBallEvent(SDL.SDL_JoyBallEvent evtJball)
+        private void handleJoyBallEvent(JoyBallEvent evtJball)
         {
         }
 
-        private void handleJoyAxisEvent(SDL.SDL_JoyAxisEvent evtJaxis)
+        private void handleJoyAxisEvent(JoyAxisEvent evtJaxis)
         {
             // if this axis exists in the controller bindings, skip it
-            if (controllers.TryGetValue(evtJaxis.which, out var state) && state.GetAxisForIndex(evtJaxis.axis) != SDL.SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_INVALID)
+            if (controllers.TryGetValue(evtJaxis.Which, out var state) && state.GetAxisForIndex(evtJaxis.Axis) != GameControllerAxis.ControllerAxisInvalid)
                 return;
 
-            enqueueJoystickAxisInput(JoystickAxisSource.Axis1 + evtJaxis.axis, evtJaxis.axisValue);
+            enqueueJoystickAxisInput(JoystickAxisSource.Axis1 + evtJaxis.Axis, evtJaxis.Value);
         }
 
-        private void handleMouseWheelEvent(SDL.SDL_MouseWheelEvent evtWheel) =>
-            ScheduleEvent(() => TriggerMouseWheel(new Vector2(evtWheel.x, evtWheel.y), false));
+        private void handleMouseWheelEvent(MouseWheelEvent evtWheel) =>
+            ScheduleEvent(() => TriggerMouseWheel(new Vector2(evtWheel.X, evtWheel.Y), false));
 
-        private void handleMouseButtonEvent(SDL.SDL_MouseButtonEvent evtButton)
+        private void handleMouseButtonEvent(MouseButtonEvent evtButton)
         {
-            MouseButton button = mouseButtonFromEvent(evtButton.button);
+            MouseButton button = mouseButtonFromEvent(evtButton.Button);
 
-            switch (evtButton.type)
+            switch ((EventType)evtButton.Type)
             {
-                case SDL.SDL_EventType.SDL_MOUSEBUTTONDOWN:
+                case EventType.Mousebuttondown:
                     ScheduleEvent(() => MouseDown?.Invoke(button));
                     break;
 
-                case SDL.SDL_EventType.SDL_MOUSEBUTTONUP:
+                case EventType.Mousebuttonup:
                     ScheduleEvent(() => MouseUp?.Invoke(button));
                     break;
             }
         }
 
-        private void handleMouseMotionEvent(SDL.SDL_MouseMotionEvent evtMotion)
+        private void handleMouseMotionEvent(MouseMotionEvent evtMotion)
         {
-            if (SDL.SDL_GetRelativeMouseMode() == SDL.SDL_bool.SDL_FALSE)
-                ScheduleEvent(() => MouseMove?.Invoke(new Vector2(evtMotion.x * Scale, evtMotion.y * Scale)));
+            if (sdl.GetRelativeMouseMode() == SdlBool.False)
+                ScheduleEvent(() => MouseMove?.Invoke(new Vector2(evtMotion.X * Scale, evtMotion.Y * Scale)));
             else
-                ScheduleEvent(() => MouseMoveRelative?.Invoke(new Vector2(evtMotion.xrel * Scale, evtMotion.yrel * Scale)));
+                ScheduleEvent(() => MouseMoveRelative?.Invoke(new Vector2(evtMotion.Xrel * Scale, evtMotion.Yrel * Scale)));
         }
 
-        private unsafe void handleTextInputEvent(SDL.SDL_TextInputEvent evtText)
+        private void handleTextInputEvent(TextInputEvent evtText)
         {
-            var ptr = new IntPtr(evtText.text);
+            var ptr = new IntPtr(evtText.Text);
             if (ptr == IntPtr.Zero)
                 return;
 
@@ -875,24 +880,24 @@ namespace osu.Framework.Platform
                 ScheduleEvent(() => KeyTyped?.Invoke(c));
         }
 
-        private void handleTextEditingEvent(SDL.SDL_TextEditingEvent evtEdit)
+        private void handleTextEditingEvent(TextEditingEvent evtEdit)
         {
         }
 
-        private void handleKeyboardEvent(SDL.SDL_KeyboardEvent evtKey)
+        private void handleKeyboardEvent(KeyboardEvent evtKey)
         {
-            Key key = evtKey.keysym.ToKey();
+            Key key = evtKey.Keysym.ToKey();
 
             if (key == Key.Unknown)
                 return;
 
-            switch (evtKey.type)
+            switch ((EventType)evtKey.Type)
             {
-                case SDL.SDL_EventType.SDL_KEYDOWN:
+                case EventType.Keydown:
                     ScheduleEvent(() => KeyDown?.Invoke(key));
                     break;
 
-                case SDL.SDL_EventType.SDL_KEYUP:
+                case EventType.Keyup:
                     ScheduleEvent(() => KeyUp?.Invoke(key));
                     break;
             }
@@ -903,15 +908,17 @@ namespace osu.Framework.Platform
             ScheduleEvent(() => KeymapChanged?.Invoke());
         }
 
-        private void handleWindowEvent(SDL.SDL_WindowEvent evtWindow)
+        private void handleWindowEvent(WindowEvent evtWindow)
         {
             updateWindowSpecifics();
 
-            switch (evtWindow.windowEvent)
+            switch ((WindowEventID)evtWindow.Event)
             {
-                case SDL.SDL_WindowEventID.SDL_WINDOWEVENT_MOVED:
+                case WindowEventID.WindoweventMoved:
                     // explicitly requery as there are occasions where what SDL has provided us with is not up-to-date.
-                    SDL.SDL_GetWindowPosition(SDLWindowHandle, out int x, out int y);
+                    int x;
+                    int y;
+                    sdl.GetWindowPosition(WindowPtr, &x, &y);
                     var newPosition = new Point(x, y);
 
                     if (!newPosition.Equals(Position))
@@ -925,31 +932,31 @@ namespace osu.Framework.Platform
 
                     break;
 
-                case SDL.SDL_WindowEventID.SDL_WINDOWEVENT_SIZE_CHANGED:
+                case WindowEventID.WindoweventSizeChanged:
                     updateWindowSize();
                     break;
 
-                case SDL.SDL_WindowEventID.SDL_WINDOWEVENT_ENTER:
+                case WindowEventID.WindoweventEnter:
                     cursorInWindow.Value = true;
                     ScheduleEvent(() => MouseEntered?.Invoke());
                     break;
 
-                case SDL.SDL_WindowEventID.SDL_WINDOWEVENT_LEAVE:
+                case WindowEventID.WindoweventLeave:
                     cursorInWindow.Value = false;
                     ScheduleEvent(() => MouseLeft?.Invoke());
                     break;
 
-                case SDL.SDL_WindowEventID.SDL_WINDOWEVENT_RESTORED:
-                case SDL.SDL_WindowEventID.SDL_WINDOWEVENT_FOCUS_GAINED:
+                case WindowEventID.WindoweventRestored:
+                case WindowEventID.WindoweventFocusGained:
                     ScheduleEvent(() => Focused = true);
                     break;
 
-                case SDL.SDL_WindowEventID.SDL_WINDOWEVENT_MINIMIZED:
-                case SDL.SDL_WindowEventID.SDL_WINDOWEVENT_FOCUS_LOST:
+                case WindowEventID.WindoweventMinimized:
+                case WindowEventID.WindoweventFocusLost:
                     ScheduleEvent(() => Focused = false);
                     break;
 
-                case SDL.SDL_WindowEventID.SDL_WINDOWEVENT_CLOSE:
+                case WindowEventID.WindoweventClose:
                     break;
             }
         }
@@ -960,7 +967,7 @@ namespace osu.Framework.Platform
         private void updateWindowSpecifics()
         {
             // don't attempt to run before the window is initialised, as Create() will do so anyway.
-            if (SDLWindowHandle == IntPtr.Zero)
+            if ((IntPtr)WindowPtr == IntPtr.Zero)
                 return;
 
             var stateBefore = windowState;
@@ -975,7 +982,7 @@ namespace osu.Framework.Platform
             }
             else
             {
-                windowState = ((SDL.SDL_WindowFlags)SDL.SDL_GetWindowFlags(SDLWindowHandle)).ToWindowState();
+                windowState = ((WindowFlags)sdl.GetWindowFlags(WindowPtr)).ToWindowState();
             }
 
             if (windowState != stateBefore)
@@ -984,7 +991,7 @@ namespace osu.Framework.Platform
                 updateMaximisedState();
             }
 
-            int newDisplayIndex = SDL.SDL_GetWindowDisplayIndex(SDLWindowHandle);
+            int newDisplayIndex = sdl.GetWindowDisplayIndex(WindowPtr);
 
             if (displayIndex != newDisplayIndex)
             {
@@ -1002,20 +1009,14 @@ namespace osu.Framework.Platform
         /// </summary>
         private void updateWindowStateAndSize()
         {
-            // this reset is required even on changing from one fullscreen resolution to another.
-            // if it is not included, the GL context will not get the correct size.
-            // this is mentioned by multiple sources as an SDL issue, which seems to resolve by similar means (see https://discourse.libsdl.org/t/sdl-setwindowsize-does-not-work-in-fullscreen/20711/4).
-            SDL.SDL_SetWindowBordered(SDLWindowHandle, SDL.SDL_bool.SDL_TRUE);
-            SDL.SDL_SetWindowFullscreen(SDLWindowHandle, (uint)SDL.SDL_bool.SDL_FALSE);
-
             switch (windowState)
             {
                 case WindowState.Normal:
                     Size = (sizeWindowed.Value * Scale).ToSize();
 
-                    SDL.SDL_RestoreWindow(SDLWindowHandle);
-                    SDL.SDL_SetWindowSize(SDLWindowHandle, sizeWindowed.Value.Width, sizeWindowed.Value.Height);
-                    SDL.SDL_SetWindowResizable(SDLWindowHandle, Resizable ? SDL.SDL_bool.SDL_TRUE : SDL.SDL_bool.SDL_FALSE);
+                    sdl.RestoreWindow(WindowPtr);
+                    sdl.SetWindowSize(WindowPtr, sizeWindowed.Value.Width, sizeWindowed.Value.Height);
+                    sdl.SetWindowResizable(WindowPtr, Resizable ? SdlBool.True : SdlBool.False);
 
                     readWindowPositionFromConfig();
                     break;
@@ -1023,10 +1024,10 @@ namespace osu.Framework.Platform
                 case WindowState.Fullscreen:
                     var closestMode = getClosestDisplayMode(sizeFullscreen.Value, currentDisplayMode.Value.RefreshRate, currentDisplay.Index);
 
-                    Size = new Size(closestMode.w, closestMode.h);
+                    Size = new Size(closestMode.W, closestMode.H);
 
-                    SDL.SDL_SetWindowDisplayMode(SDLWindowHandle, ref closestMode);
-                    SDL.SDL_SetWindowFullscreen(SDLWindowHandle, (uint)SDL.SDL_WindowFlags.SDL_WINDOW_FULLSCREEN);
+                    sdl.SetWindowDisplayMode(WindowPtr, ref closestMode);
+                    sdl.SetWindowFullscreen(WindowPtr, (uint)WindowFlags.WindowFullscreen);
                     break;
 
                 case WindowState.FullscreenBorderless:
@@ -1034,22 +1035,25 @@ namespace osu.Framework.Platform
                     break;
 
                 case WindowState.Maximised:
-                    SDL.SDL_RestoreWindow(SDLWindowHandle);
-                    SDL.SDL_MaximizeWindow(SDLWindowHandle);
+                    sdl.RestoreWindow(WindowPtr);
+                    sdl.MaximizeWindow(WindowPtr);
 
-                    SDL.SDL_GL_GetDrawableSize(SDLWindowHandle, out int w, out int h);
+                    int w;
+                    int h;
+                    sdl.GLGetDrawableSize(WindowPtr, &w, &h);
                     Size = new Size(w, h);
                     break;
 
                 case WindowState.Minimised:
-                    SDL.SDL_MinimizeWindow(SDLWindowHandle);
+                    sdl.MinimizeWindow(WindowPtr);
                     break;
             }
 
             updateMaximisedState();
 
-            if (SDL.SDL_GetWindowDisplayMode(SDLWindowHandle, out var mode) >= 0)
-                currentDisplayMode.Value = new DisplayMode(mode.format.ToString(), new Size(mode.w, mode.h), 32, mode.refresh_rate, displayIndex, displayIndex);
+            Silk.NET.SDL.DisplayMode mode;
+            if (sdl.GetWindowDisplayMode(WindowPtr, &mode) >= 0)
+                currentDisplayMode.Value = new DisplayMode(mode.Format.ToString(), new Size(mode.W, mode.H), 32, mode.RefreshRate, displayIndex, displayIndex);
         }
 
         private void updateMaximisedState()
@@ -1113,46 +1117,49 @@ namespace osu.Framework.Platform
         protected virtual Size SetBorderless()
         {
             // this is a generally sane method of handling borderless, and works well on macOS and linux.
-            SDL.SDL_SetWindowFullscreen(SDLWindowHandle, (uint)SDL.SDL_WindowFlags.SDL_WINDOW_FULLSCREEN_DESKTOP);
+            sdl.SetWindowFullscreen(WindowPtr, (uint)WindowFlags.WindowFullscreenDesktop);
 
             return currentDisplay.Bounds.Size;
         }
 
         private MouseButton mouseButtonFromEvent(byte button)
         {
-            switch ((uint)button)
+            switch (button)
             {
                 default:
-                case SDL.SDL_BUTTON_LEFT:
+                case 1:
                     return MouseButton.Left;
 
-                case SDL.SDL_BUTTON_RIGHT:
-                    return MouseButton.Right;
-
-                case SDL.SDL_BUTTON_MIDDLE:
+                case 2:
                     return MouseButton.Middle;
 
-                case SDL.SDL_BUTTON_X1:
-                    return MouseButton.Button1;
+                case 3:
+                    return MouseButton.Right;
 
-                case SDL.SDL_BUTTON_X2:
-                    return MouseButton.Button2;
+                case 4:
+                    return MouseButton.Button4;
+
+                case 5:
+                    return MouseButton.Button5;
             }
         }
 
         #endregion
 
-        protected virtual IGraphicsBackend CreateGraphicsBackend() => new SDL2GraphicsBackend();
+        protected virtual IGraphicsBackend CreateGraphicsBackend()
+        {
+            return new SDL2GraphicsBackend();
+        }
 
         public void SetupWindow(FrameworkConfigManager config)
         {
             CurrentDisplayBindable.ValueChanged += evt =>
             {
-                windowDisplayIndexBindable.Value = (DisplayIndex)evt.NewValue.Index;
+                windowDisplayIndexBindable.Value = evt.NewValue;
             };
 
             config.BindWith(FrameworkSetting.LastDisplayDevice, windowDisplayIndexBindable);
-            windowDisplayIndexBindable.BindValueChanged(evt => CurrentDisplay = Displays.ElementAtOrDefault((int)evt.NewValue) ?? PrimaryDisplay, true);
+            windowDisplayIndexBindable.BindValueChanged(evt => CurrentDisplay = Displays.ElementAtOrDefault(evt.NewValue.Index) ?? PrimaryDisplay, true);
 
             sizeFullscreen.ValueChanged += evt =>
             {
@@ -1232,7 +1239,7 @@ namespace osu.Framework.Platform
         /// </summary>
         /// <param name="position">A position inside the window.</param>
         public void UpdateMousePosition(Vector2 position) => ScheduleCommand(() =>
-            SDL.SDL_WarpMouseInWindow(SDLWindowHandle, (int)(position.X / Scale), (int)(position.Y / Scale)));
+            sdl.WarpMouseInWindow(WindowPtr, (int)(position.X / Scale), (int)(position.Y / Scale)));
 
         public void SetIconFromStream(Stream stream)
         {
@@ -1278,54 +1285,62 @@ namespace osu.Framework.Platform
             }
 
             if (confine)
-                CursorStateBindable.Value |= CursorState.Confined;
+                CursorStateBindable.Value |= CursorMode.Raw;
             else
-                CursorStateBindable.Value &= ~CursorState.Confined;
+                CursorStateBindable.Value &= ~CursorMode.Raw;
         }
 
         #region Helper functions
 
-        private SDL.SDL_DisplayMode getClosestDisplayMode(Size size, int refreshRate, int displayIndex)
+        private Silk.NET.SDL.DisplayMode getClosestDisplayMode(Size size, int refreshRate, int displayIndex)
         {
-            var targetMode = new SDL.SDL_DisplayMode { w = size.Width, h = size.Height, refresh_rate = refreshRate };
+            var targetMode = new Silk.NET.SDL.DisplayMode { W = size.Width, H = size.Height, RefreshRate = refreshRate };
 
-            if (SDL.SDL_GetClosestDisplayMode(displayIndex, ref targetMode, out var mode) != IntPtr.Zero)
+            Silk.NET.SDL.DisplayMode mode;
+            if (sdl.GetClosestDisplayMode(displayIndex, ref targetMode, &mode) != null)
                 return mode;
 
             // fallback to current display's native bounds
-            targetMode.w = currentDisplay.Bounds.Width;
-            targetMode.h = currentDisplay.Bounds.Height;
-            targetMode.refresh_rate = 0;
+            targetMode.W = currentDisplay.Bounds.Width;
+            targetMode.H = currentDisplay.Bounds.Height;
+            targetMode.RefreshRate = 0;
 
-            if (SDL.SDL_GetClosestDisplayMode(displayIndex, ref targetMode, out mode) != IntPtr.Zero)
+            if (sdl.GetClosestDisplayMode(displayIndex, ref targetMode, ref mode) != null)
                 return mode;
 
             // finally return the current mode if everything else fails.
             // not sure this is required.
-            if (SDL.SDL_GetWindowDisplayMode(SDLWindowHandle, out mode) >= 0)
+            if (sdl.GetWindowDisplayMode(WindowPtr, ref mode) >= 0)
                 return mode;
 
             throw new InvalidOperationException("couldn't retrieve valid display mode");
         }
 
-        private static Display displayFromSDL(int displayIndex)
+        private Display displayFromSDL(int displayIndex)
         {
-            var displayModes = Enumerable.Range(0, SDL.SDL_GetNumDisplayModes(displayIndex))
+            var displayModes = Enumerable.Range(0, sdl.GetNumDisplayModes(displayIndex))
                                          .Select(modeIndex =>
                                          {
-                                             SDL.SDL_GetDisplayMode(displayIndex, modeIndex, out var mode);
+                                             Silk.NET.SDL.DisplayMode mode = new Silk.NET.SDL.DisplayMode();
+                                             sdl.GetDisplayMode(displayIndex, modeIndex, &mode);
                                              return displayModeFromSDL(mode, displayIndex, modeIndex);
                                          })
                                          .ToArray();
 
-            SDL.SDL_GetDisplayBounds(displayIndex, out var rect);
-            return new Display(displayIndex, SDL.SDL_GetDisplayName(displayIndex), new Rectangle(rect.x, rect.y, rect.w, rect.h), displayModes);
+            Rectangle<int> rect;
+            sdl.GetDisplayBounds(displayIndex, &rect);
+            return new Display(displayIndex, sdl.GetDisplayNameS(displayIndex), new Rectangle(rect.Origin.X, rect.Origin.Y, rect.Size.X, rect.Size.Y), displayModes);
         }
 
-        private static DisplayMode displayModeFromSDL(SDL.SDL_DisplayMode mode, int displayIndex, int modeIndex)
+        private DisplayMode displayModeFromSDL(Silk.NET.SDL.DisplayMode mode, int displayIndex, int modeIndex)
         {
-            SDL.SDL_PixelFormatEnumToMasks(mode.format, out int bpp, out _, out _, out _, out _);
-            return new DisplayMode(SDL.SDL_GetPixelFormatName(mode.format), new Size(mode.w, mode.h), bpp, mode.refresh_rate, modeIndex, displayIndex);
+            int bpp;
+            uint tmp1;
+            uint tmp2;
+            uint tmp3;
+            uint tmp4;
+            sdl.PixelFormatEnumToMasks(mode.Format, &bpp, &tmp1, &tmp2, &tmp3, &tmp4);
+            return new DisplayMode(sdl.GetPixelFormatNameS(mode.Format), new Size(mode.W, mode.H), bpp, mode.RefreshRate, modeIndex, displayIndex);
         }
 
         #endregion

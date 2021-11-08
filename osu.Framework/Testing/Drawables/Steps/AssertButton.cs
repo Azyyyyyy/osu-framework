@@ -3,7 +3,7 @@
 
 using System;
 using System.Diagnostics;
-using osuTK.Graphics;
+using osu.Framework.Graphics;
 
 namespace osu.Framework.Testing.Drawables.Steps
 {
@@ -17,7 +17,7 @@ namespace osu.Framework.Testing.Drawables.Steps
             : base(isSetupStep)
         {
             Action += checkAssert;
-            LightColour = Color4.OrangeRed;
+            LightColour = Colour4.OrangeRed;
         }
 
         private void checkAssert()

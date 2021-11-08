@@ -1,15 +1,15 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osu.Framework.Graphics.Textures;
-using osuTK.Graphics.ES30;
-using osuTK;
 using System;
+using System.Numerics;
 using osu.Framework.Graphics.Batches;
 using osu.Framework.Graphics.Primitives;
-using osuTK.Graphics;
 using osu.Framework.Extensions.MatrixExtensions;
 using osu.Framework.Graphics.OpenGL.Vertices;
+using Silk.NET.Maths;
+using Silk.NET.OpenGL;
+using Texture = osu.Framework.Graphics.Textures.Texture;
 
 namespace osu.Framework.Graphics.UserInterface
 {
@@ -48,7 +48,7 @@ namespace osu.Framework.Graphics.UserInterface
         private float angleToUnitInterval(float angle) => angle / two_pi + (angle >= 0 ? 0 : 1);
 
         // Gets colour at the localPos position in the unit square of our Colour gradient box.
-        private Color4 colourAt(Vector2 localPos) => DrawColourInfo.Colour.HasSingleColour
+        private Colour4 colourAt(Vector2 localPos) => DrawColourInfo.Colour.HasSingleColour
             ? DrawColourInfo.Colour.TopLeft.Linear
             : DrawColourInfo.Colour.Interpolate(localPos).Linear;
 
@@ -74,15 +74,15 @@ namespace osu.Framework.Graphics.UserInterface
                 halfCircleBatch = new LinearBatch<TexturedVertex2D>(amountPoints * 2, 1, PrimitiveType.TriangleStrip);
             }
 
-            Matrix3 transformationMatrix = DrawInfo.Matrix;
+            Matrix3X3<float> transformationMatrix = DrawInfo.Matrix;
             MatrixExtensions.ScaleFromLeft(ref transformationMatrix, drawSize);
 
             Vector2 current = origin + pointOnCircle(start_angle) * 0.5f;
-            Color4 currentColour = colourAt(current);
+            Colour4 currentColour = colourAt(current);
             current = Vector2Extensions.Transform(current, transformationMatrix);
 
             Vector2 screenOrigin = Vector2Extensions.Transform(origin, transformationMatrix);
-            Color4 originColour = colourAt(origin);
+            Colour4 originColour = colourAt(origin);
 
             // Offset by 0.5 pixels inwards to ensure we never sample texels outside the bounds
             RectangleF texRect = texture.GetTextureRect(new RectangleF(0.5f, 0.5f, texture.Width - 1, texture.Height - 1));

@@ -5,7 +5,9 @@ using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using osu.Framework.Platform.Windows.Native;
-using SDL2;
+using Silk.NET.SDL;
+using Icon = osu.Framework.Platform.Windows.Native.Icon;
+using Point = System.Drawing.Point;
 
 namespace osu.Framework.Platform.Windows
 {
@@ -21,6 +23,8 @@ namespace osu.Framework.Platform.Windows
         private Icon smallIcon;
         private Icon largeIcon;
 
+        private readonly Sdl sdl = SdlProvider.SDL.Value;
+
         public WindowsWindow()
         {
             try
@@ -34,9 +38,9 @@ namespace osu.Framework.Platform.Windows
             }
         }
 
-        protected override Size SetBorderless()
+        protected override unsafe Size SetBorderless()
         {
-            SDL.SDL_SetWindowBordered(SDLWindowHandle, SDL.SDL_bool.SDL_FALSE);
+            sdl.SetWindowBordered(WindowPtr, SdlBool.False);
 
             Size positionOffsetHack = new Size(1, 1);
 
@@ -44,7 +48,7 @@ namespace osu.Framework.Platform.Windows
             var newPosition = CurrentDisplay.Bounds.Location - positionOffsetHack;
 
             // for now let's use the same 1px hack that we've always used to force borderless.
-            SDL.SDL_SetWindowSize(SDLWindowHandle, newSize.Width, newSize.Height);
+            sdl.SetWindowSize(WindowPtr, newSize.Width, newSize.Height);
             Position = newPosition;
 
             return newSize;

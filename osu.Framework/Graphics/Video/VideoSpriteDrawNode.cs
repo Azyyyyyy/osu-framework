@@ -2,9 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osuTK;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.OpenGL.Vertices;
+using Silk.NET.Maths;
 
 namespace osu.Framework.Graphics.Video
 {
@@ -27,7 +27,7 @@ namespace osu.Framework.Graphics.Video
             Shader.GetUniform<int>("m_SamplerV").UpdateValue(ref vLoc);
 
             var yuvCoeff = video.ConversionMatrix;
-            Shader.GetUniform<Matrix3>("yuvCoeff").UpdateValue(ref yuvCoeff);
+            Shader.GetUniform<Matrix3X3<float>>("yuvCoeff").UpdateValue(ref yuvCoeff);
 
             base.Draw(vertexAction);
         }

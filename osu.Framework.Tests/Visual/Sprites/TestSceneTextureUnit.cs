@@ -9,9 +9,10 @@ using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Testing;
-using osuTK.Graphics.ES30;
+using Silk.NET.OpenGL;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
+using Texture = osu.Framework.Graphics.Textures.Texture;
 
 namespace osu.Framework.Tests.Visual.Sprites
 {

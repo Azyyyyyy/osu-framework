@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using System.Numerics;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
@@ -11,8 +12,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Utils;
-using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Framework.Tests.Visual.Drawables
 {
@@ -58,7 +57,7 @@ namespace osu.Framework.Tests.Visual.Drawables
                             Anchor = Anchor.CentreLeft,
                             Origin = Anchor.CentreLeft,
                             Size = new Vector2(750f, 50f),
-                            Colour = ColourInfo.GradientHorizontal(Color4.Red, Color4.Blue),
+                            Colour = ColourInfo.GradientHorizontal(Colour4.Red, Colour4.Blue),
                         },
                         new SpriteText
                         {
@@ -77,7 +76,7 @@ namespace osu.Framework.Tests.Visual.Drawables
                             {
                                 Width = 1f,
                                 RelativeSizeAxes = Axes.Y,
-                                Colour = Interpolation.ValueAt(i, Color4.Red, Color4.Blue, 0, 750),
+                                Colour = Interpolation.ValueAt(i, Colour4.Red, Colour4.Blue, 0, 750),
                             }),
                         },
                     }
@@ -87,7 +86,7 @@ namespace osu.Framework.Tests.Visual.Drawables
             AddAssert("interpolation in linear space", () =>
             {
                 var middle = interpolatingLines.Children[interpolatingLines.Children.Count / 2];
-                return middle.Colour.AverageColour.Linear == new Color4(0.5f, 0f, 0.5f, 1f);
+                return middle.Colour.AverageColour.Linear == new Colour4(0.5f, 0f, 0.5f, 1f);
             });
         }
 

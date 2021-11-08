@@ -2,51 +2,61 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using SDL2;
+using osu.Framework.Graphics.OpenGL;
+using Silk.NET.OpenGL;
+using Silk.NET.SDL;
 
 namespace osu.Framework.Platform.SDL2
 {
     /// <summary>
     /// Implementation of <see cref="PassthroughGraphicsBackend"/> that uses SDL's OpenGL bindings.
     /// </summary>
-    public class SDL2GraphicsBackend : PassthroughGraphicsBackend
+    public unsafe class SDL2GraphicsBackend : PassthroughGraphicsBackend
     {
-        private IntPtr sdlWindowHandle;
+        private readonly Sdl sdl = SdlProvider.SDL.Value;
+        private Window* window;
 
         public override bool VerticalSync
         {
-            get => SDL.SDL_GL_GetSwapInterval() != 0;
-            set => SDL.SDL_GL_SetSwapInterval(value ? 1 : 0);
+            get => sdl.GLGetSwapInterval() != 0;
+            set => sdl.GLSetSwapInterval(value ? 1 : 0);
+        }
+
+        public void SetWindow(Window* window)
+        {
+            this.window = window;
         }
 
         protected override IntPtr CreateContext()
         {
-            SDL.SDL_GL_SetAttribute(SDL.SDL_GLattr.SDL_GL_CONTEXT_PROFILE_MASK, SDL.SDL_GLprofile.SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
+            sdl.GLSetAttribute(GLattr.GLContextProfileMask, (int)GLprofile.GLContextProfileCompatibility);
 
-            IntPtr context = SDL.SDL_GL_CreateContext(sdlWindowHandle);
+            IntPtr context = (IntPtr)sdl.GLCreateContext(window);
+            var gl = GL.GetApi(GetProcAddress);
+            GLWrapper.SetGL(gl);
+
             if (context == IntPtr.Zero)
-                throw new InvalidOperationException($"Failed to create an SDL2 GL context ({SDL.SDL_GetError()})");
+                throw new InvalidOperationException($"Failed to create an SDL2 GL context ({sdl.GetErrorS()})");
 
             return context;
         }
 
         protected override void MakeCurrent(IntPtr context)
         {
-            int result = SDL.SDL_GL_MakeCurrent(sdlWindowHandle, context);
+            int result = sdl.GLMakeCurrent(window, (void*)context);
             if (result < 0)
-                throw new InvalidOperationException($"Failed to acquire GL context ({SDL.SDL_GetError()})");
+                throw new InvalidOperationException($"Failed to acquire GL context ({sdl.GetErrorS()})");
         }
 
-        public override void SwapBuffers() => SDL.SDL_GL_SwapWindow(sdlWindowHandle);
+        public override void SwapBuffers() => sdl.GLSwapWindow(window);
 
-        protected override IntPtr GetProcAddress(string symbol) => SDL.SDL_GL_GetProcAddress(symbol);
+        protected override IntPtr GetProcAddress(string symbol) => (IntPtr)sdl.GLGetProcAddress(symbol);
 
         public override void Initialise(IWindow window)
         {
-            if (!(window is SDL2DesktopWindow sdlWindow))
+            if (window is not SDL2DesktopWindow)
                 throw new ArgumentException("Unsupported window backend.", nameof(window));
 
-            sdlWindowHandle = sdlWindow.SDLWindowHandle;
             base.Initialise(window);
         }
     }

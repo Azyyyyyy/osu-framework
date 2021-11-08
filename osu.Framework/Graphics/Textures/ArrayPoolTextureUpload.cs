@@ -4,7 +4,7 @@
 using System;
 using System.Buffers;
 using osu.Framework.Graphics.Primitives;
-using osuTK.Graphics.ES30;
+using Silk.NET.OpenGL;
 using SixLabors.ImageSharp.PixelFormats;
 
 namespace osu.Framework.Graphics.Textures

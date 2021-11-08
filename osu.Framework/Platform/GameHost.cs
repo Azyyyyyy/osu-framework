@@ -8,16 +8,13 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Numerics;
 using System.Runtime;
 using System.Runtime.ExceptionServices;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
-using osuTK;
-using osuTK.Graphics;
-using osuTK.Graphics.ES30;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
@@ -40,9 +37,9 @@ using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Video;
 using osu.Framework.IO.Serialization;
 using osu.Framework.IO.Stores;
+using Silk.NET.OpenGL;
 using SixLabors.ImageSharp.Memory;
 using Image = SixLabors.ImageSharp.Image;
-using PixelFormat = osuTK.Graphics.ES30.PixelFormat;
 using Size = System.Drawing.Size;
 
 namespace osu.Framework.Platform
@@ -421,7 +418,7 @@ namespace osu.Framework.Platform
                 Root.Size = new Vector2(Window.ClientSize.Width, Window.ClientSize.Height);
 
             // Ensure we maintain a valid size for any children immediately scaling by the window size
-            Root.Size = Vector2.ComponentMax(Vector2.One, Root.Size);
+            Root.Size = Vector2Extensions.ComponentMax(Vector2.One, Root.Size);
 
             TypePerformanceMonitor.NewFrame();
 
@@ -465,7 +462,7 @@ namespace osu.Framework.Platform
                     {
                         depthValue.Reset();
 
-                        GL.ColorMask(false, false, false, false);
+                        GLWrapper.GL.ColorMask(false, false, false, false);
                         GLWrapper.SetBlend(BlendingParameters.None);
                         GLWrapper.PushDepthInfo(DepthInfo.Default);
 
@@ -473,7 +470,7 @@ namespace osu.Framework.Platform
                         buffer.Object.DrawOpaqueInteriorSubTree(depthValue, null);
 
                         GLWrapper.PopDepthInfo();
-                        GL.ColorMask(true, true, true, true);
+                        GLWrapper.GL.ColorMask(true, true, true, true);
 
                         // The back pass doesn't write depth, but needs to depth test properly
                         GLWrapper.PushDepthInfo(new DepthInfo(true, false));
@@ -512,7 +509,7 @@ namespace osu.Framework.Platform
             if (Window.VerticalSync)
                 // without glFinish, vsync is basically unplayable due to the extra latency introduced.
                 // we will likely want to give the user control over this in the future as an advanced setting.
-                GL.Finish();
+                GLWrapper.GL.Finish();
         }
 
         /// <summary>
@@ -533,10 +530,10 @@ namespace osu.Framework.Platform
                 {
                     if (Window is SDL2DesktopWindow win)
                         win.MakeCurrent();
-                    else if (GraphicsContext.CurrentContext == null)
-                        throw new GraphicsContextMissingException();
+                    else if (GLWrapper.GL.Context == null)
+                        throw new Exception();
 
-                    GL.ReadPixels(0, 0, width, height, PixelFormat.Rgba, PixelType.UnsignedByte, ref MemoryMarshal.GetReference(pixelData.Memory.Span));
+                    GLWrapper.GL.ReadPixels(0, 0, (uint)width, (uint)height, PixelFormat.Rgba, PixelType.UnsignedByte, out pixelData.Memory.Span.GetPinnableReference());
 
                     // ReSharper disable once AccessToDisposedClosure
                     completionEvent.Set();
@@ -681,8 +678,8 @@ namespace osu.Framework.Platform
                 {
                     Window.SetupWindow(Config);
 
-                    Window.Create();
                     Window.Title = $@"osu!framework (running ""{Name}"")";
+                    Window.Create();
 
                     currentDisplayMode = Window.CurrentDisplayMode.GetBoundCopy();
                     currentDisplayMode.BindValueChanged(_ => updateFrameSyncMode());
@@ -717,10 +714,6 @@ namespace osu.Framework.Platform
                         {
                             case SDL2DesktopWindow window:
                                 window.Update += windowUpdate;
-                                break;
-
-                            case OsuTKWindow tkWindow:
-                                tkWindow.UpdateFrame += (o, e) => windowUpdate();
                                 break;
                         }
 

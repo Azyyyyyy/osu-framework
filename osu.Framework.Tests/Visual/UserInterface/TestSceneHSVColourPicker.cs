@@ -2,14 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using System.Numerics;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
-using osuTK;
-using osuTK.Graphics;
-using osuTK.Input;
+using Silk.NET.Input;
 
 namespace osu.Framework.Tests.Visual.UserInterface
 {
@@ -54,7 +53,7 @@ namespace osu.Framework.Tests.Visual.UserInterface
         [Test]
         public void SaturationValueSelectorInput()
         {
-            AddStep("set initial colour", () => colourPicker.Current.Value = Color4.Red);
+            AddStep("set initial colour", () => colourPicker.Current.Value = Colour4.Red);
             assertSaturationAndValue(1, 1, 0);
 
             AddStep("click top left corner", () =>

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Numerics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using osu.Framework.Allocation;
@@ -12,8 +13,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
-using osuTK;
-using osuTK.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Extensions.TypeExtensions;
 
@@ -150,7 +149,7 @@ namespace osu.Framework.Graphics.Visualisation
                                 },
                                 valueText = new SpriteText
                                 {
-                                    Colour = Color4.White,
+                                    Colour = Colour4.White,
                                     Font = FrameworkFont.Regular
                                 },
                             }
@@ -161,7 +160,7 @@ namespace osu.Framework.Graphics.Visualisation
                         Size = new Vector2(4, 18),
                         Anchor = Anchor.CentreRight,
                         Origin = Anchor.CentreRight,
-                        Colour = Color4.Red
+                        Colour = Colour4.Red
                     }
                 });
 

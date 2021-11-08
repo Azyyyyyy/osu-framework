@@ -3,6 +3,7 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
@@ -12,8 +13,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
-using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Framework.Tests.Exceptions
 {
@@ -255,7 +254,7 @@ namespace osu.Framework.Tests.Exceptions
             {
                 this.throws = throws;
                 Size = new Vector2(50);
-                Colour = Color4.Green;
+                Colour = Colour4.Green;
             }
 
             [BackgroundDependencyLoader]

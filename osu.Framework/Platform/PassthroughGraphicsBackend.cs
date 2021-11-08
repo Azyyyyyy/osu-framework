@@ -2,20 +2,16 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
 using osu.Framework.Graphics.OpenGL;
 using osu.Framework.Logging;
-using osuTK.Graphics;
-using osuTK.Graphics.ES30;
+using Silk.NET.OpenGL;
 
 namespace osu.Framework.Platform
 {
     /// <summary>
     /// Implementation of <see cref="IGraphicsBackend"/> that force-loads OpenGL
-    /// endpoints into osuTK's bindings.
+    /// endpoints into Silk.NET's bindings.
     /// </summary>
     public abstract class PassthroughGraphicsBackend : IGraphicsBackend
     {
@@ -41,9 +37,7 @@ namespace osu.Framework.Platform
 
             MakeCurrent(Context);
 
-            loadTKBindings();
-
-            string version = GL.GetString(StringName.Version);
+            string version = GLWrapper.GL.GetStringS(StringName.Version);
             string versionNumberSubstring = getVersionNumberSubstring(version);
 
             GLVersion = new Version(versionNumberSubstring);
@@ -52,7 +46,7 @@ namespace osu.Framework.Platform
             IsEmbedded = version.Contains("OpenGL ES");
             GLWrapper.IsEmbedded = IsEmbedded;
 
-            version = GL.GetString(StringName.ShadingLanguageVersion);
+            version = GLWrapper.GL.GetStringS(StringName.ShadingLanguageVersion);
 
             if (!string.IsNullOrEmpty(version))
             {
@@ -70,11 +64,11 @@ namespace osu.Framework.Platform
                 GLSLVersion = new Version();
 
             Logger.Log($@"GL Initialized
-                        GL Version:                 {GL.GetString(StringName.Version)}
-                        GL Renderer:                {GL.GetString(StringName.Renderer)}
-                        GL Shader Language version: {GL.GetString(StringName.ShadingLanguageVersion)}
-                        GL Vendor:                  {GL.GetString(StringName.Vendor)}
-                        GL Extensions:              {GL.GetString(StringName.Extensions)}");
+                        GL Version:                 {GLWrapper.GL.GetStringS(StringName.Version)}
+                        GL Renderer:                {GLWrapper.GL.GetStringS(StringName.Renderer)}
+                        GL Shader Language version: {GLWrapper.GL.GetStringS(StringName.ShadingLanguageVersion)}
+                        GL Vendor:                  {GLWrapper.GL.GetStringS(StringName.Vendor)}
+                        GL Extensions:              {GLWrapper.GL.GetStringS(StringName.Extensions)}");
 
             // We need to release the context in this thread, since Windows locks it and prevents
             // the draw thread from taking it. macOS seems to gracefully ignore this.
@@ -84,42 +78,6 @@ namespace osu.Framework.Platform
         public void MakeCurrent() => MakeCurrent(Context);
 
         public void ClearCurrent() => MakeCurrent(IntPtr.Zero);
-
-        private void loadTKBindings()
-        {
-            loadEntryPoints(new osuTK.Graphics.OpenGL.GL());
-            loadEntryPoints(new osuTK.Graphics.OpenGL4.GL());
-            loadEntryPoints(new osuTK.Graphics.ES11.GL());
-            loadEntryPoints(new osuTK.Graphics.ES20.GL());
-            loadEntryPoints(new GL());
-        }
-
-        private unsafe void loadEntryPoints(GraphicsBindingsBase bindings)
-        {
-            var type = bindings.GetType();
-            var pointsInfo = type.GetRuntimeFields().First(x => x.Name == "_EntryPointsInstance");
-            var namesInfo = type.GetRuntimeFields().First(x => x.Name == "_EntryPointNamesInstance");
-            var offsetsInfo = type.GetRuntimeFields().First(x => x.Name == "_EntryPointNameOffsetsInstance");
-
-            var entryPointsInstance = (IntPtr[])pointsInfo.GetValue(bindings);
-            byte[] entryPointNamesInstance = (byte[])namesInfo.GetValue(bindings);
-            int[] entryPointNameOffsetsInstance = (int[])offsetsInfo.GetValue(bindings);
-
-            Debug.Assert(entryPointsInstance != null);
-            Debug.Assert(entryPointNameOffsetsInstance != null);
-
-            fixed (byte* name = entryPointNamesInstance)
-            {
-                for (int i = 0; i < entryPointsInstance.Length; i++)
-                {
-                    byte* ptr = name + entryPointNameOffsetsInstance[i];
-                    string str = Marshal.PtrToStringAnsi(new IntPtr(ptr));
-                    entryPointsInstance[i] = GetProcAddress(str);
-                }
-            }
-
-            pointsInfo.SetValue(bindings, entryPointsInstance);
-        }
 
         private string getVersionNumberSubstring(string version)
         {

@@ -3,7 +3,7 @@
 
 using osu.Framework.Input.Bindings;
 using osu.Framework.Platform.SDL2;
-using SDL2;
+using Silk.NET.SDL;
 
 namespace osu.Framework.Platform.Windows
 {
@@ -21,15 +21,15 @@ namespace osu.Framework.Platform.Windows
             }
         }
 
-        protected override bool TryGetNameFromKeycode(SDL.SDL_Keycode keycode, out string name)
+        protected override bool TryGetNameFromKeycode(KeyCode keycode, out string name)
         {
             switch (keycode)
             {
-                case SDL.SDL_Keycode.SDLK_LGUI:
+                case KeyCode.KLgui:
                     name = "LWin";
                     return true;
 
-                case SDL.SDL_Keycode.SDLK_RGUI:
+                case KeyCode.KRgui:
                     name = "RWin";
                     return true;
 

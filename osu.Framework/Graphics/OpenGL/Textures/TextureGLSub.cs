@@ -2,12 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Numerics;
 using osu.Framework.Graphics.Primitives;
-using osuTK;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.Graphics.Textures;
-using osuTK.Graphics.ES30;
+using Silk.NET.OpenGL;
 
 namespace osu.Framework.Graphics.OpenGL.Textures
 {
@@ -20,7 +20,7 @@ namespace osu.Framework.Graphics.OpenGL.Textures
 
         public override TextureGL Native => parent.Native;
 
-        public override int TextureId => parent.TextureId;
+        public override uint TextureId => parent.TextureId;
         public override bool Loaded => parent.Loaded;
 
         internal override bool IsQueuedForUpload

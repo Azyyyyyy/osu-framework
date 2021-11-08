@@ -4,7 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using osu.Framework.Input.Events;
-using osuTK.Input;
+using Silk.NET.Input;
 
 namespace osu.Framework.Graphics.Containers
 {

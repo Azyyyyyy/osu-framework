@@ -2,13 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections.Immutable;
+using System.Numerics;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Input.Handlers;
 using osu.Framework.Input.StateChanges;
 using osu.Framework.Input.StateChanges.Events;
-using osu.Framework.Platform;
-using osuTK;
-using osuTK.Input;
+using Silk.NET.Input;
 
 namespace osu.Framework.Input
 {
@@ -35,7 +34,7 @@ namespace osu.Framework.Input
                     var mouse = mousePositionChange.State.Mouse;
 
                     // confine cursor
-                    if (Host.Window != null && Host.Window.CursorState.HasFlagFast(CursorState.Confined))
+                    if (Host.Window != null && Host.Window.CursorState.HasFlagFast(CursorMode.Raw))
                     {
                         var clientSize = Host.Window.ClientSize;
                         mouse.Position = Vector2.Clamp(mouse.Position, Vector2.Zero, new Vector2(clientSize.Width - 1, clientSize.Height - 1));

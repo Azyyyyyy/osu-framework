@@ -1,16 +1,14 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Numerics;
 using NUnit.Framework;
-using osu.Framework.Extensions.Color4Extensions;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
-using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Framework.Tests.Visual.Containers
 {
@@ -66,14 +64,14 @@ namespace osu.Framework.Tests.Visual.Containers
                     {
                         new Box
                         {
-                            Colour = Color4.Green,
+                            Colour = Colour4.Green,
                             RelativeSizeAxes = Axes.Both
                         },
                         boxSizeReference = new Box
                         {
                             RelativeSizeAxes = Axes.X,
                             Height = autosize_height,
-                            Colour = Color4.Red.Opacity(0.2f),
+                            Colour = Colour4.Red.Opacity(0.2f),
                         }
                     }
                 };
@@ -119,7 +117,7 @@ namespace osu.Framework.Tests.Visual.Containers
         {
             Add(new Box
             {
-                Colour = Color4.Black,
+                Colour = Colour4.Black,
                 Size = new Vector2(22, 4),
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre
@@ -127,7 +125,7 @@ namespace osu.Framework.Tests.Visual.Containers
 
             Add(new Box
             {
-                Colour = Color4.Black,
+                Colour = Colour4.Black,
                 Size = new Vector2(4, 22),
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre
@@ -135,7 +133,7 @@ namespace osu.Framework.Tests.Visual.Containers
 
             Add(new Box
             {
-                Colour = Color4.WhiteSmoke,
+                Colour = Colour4.WhiteSmoke,
                 Size = new Vector2(20, 2),
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre
@@ -143,7 +141,7 @@ namespace osu.Framework.Tests.Visual.Containers
 
             Add(new Box
             {
-                Colour = Color4.WhiteSmoke,
+                Colour = Colour4.WhiteSmoke,
                 Size = new Vector2(2, 20),
                 Anchor = Anchor.Centre,
                 Origin = Anchor.Centre
@@ -178,7 +176,7 @@ namespace osu.Framework.Tests.Visual.Containers
                         Size = new Vector2(25, 25),
                         Origin = Anchor.Centre,
                         Anchor = Anchor.Centre,
-                        Colour = Color4.Blue,
+                        Colour = Colour4.Blue,
                     });
 
                     box.Add(box = new InfofulBox
@@ -187,7 +185,7 @@ namespace osu.Framework.Tests.Visual.Containers
                         Alpha = 0.5f,
                         Origin = Anchor.Centre,
                         Anchor = Anchor.Centre,
-                        Colour = Color4.DarkSeaGreen,
+                        Colour = Colour4.DarkSeaGreen,
                     });
 
                     box.OnUpdate += delegate { box.Rotation += 0.05f; };
@@ -204,7 +202,7 @@ namespace osu.Framework.Tests.Visual.Containers
 
                     box.Add(box = new InfofulBoxAutoSize
                     {
-                        Colour = Color4.DarkSeaGreen,
+                        Colour = Colour4.DarkSeaGreen,
                         Alpha = 0.5f,
                         Origin = Anchor.Centre,
                         Anchor = Anchor.Centre
@@ -221,7 +219,7 @@ namespace osu.Framework.Tests.Visual.Containers
                         Alpha = 0.5f,
                         Origin = Anchor.Centre,
                         Anchor = Anchor.Centre,
-                        Colour = Color4.Blue,
+                        Colour = Colour4.Blue,
                     });
                     break;
 
@@ -232,13 +230,13 @@ namespace osu.Framework.Tests.Visual.Containers
                         Origin = Anchor.Centre
                     });
 
-                    addCornerMarkers(box, 10, Color4.YellowGreen);
+                    addCornerMarkers(box, 10, Colour4.YellowGreen);
 
                     for (int i = 0; i < 40; i++)
                     {
                         box.Add(box = new InfofulBoxAutoSize
                         {
-                            Colour = new Color4(253, 253, 253, 255),
+                            Colour = new Colour4(253, 253, 253, 255),
                             Position = new Vector2(-3, -3),
                             Origin = Anchor.BottomRight,
                             Anchor = Anchor.BottomRight,
@@ -253,7 +251,7 @@ namespace osu.Framework.Tests.Visual.Containers
                         Size = new Vector2(50, 50),
                         Origin = Anchor.BottomRight,
                         Anchor = Anchor.BottomRight,
-                        Colour = Color4.SeaGreen,
+                        Colour = Colour4.SeaGreen,
                     });
                     break;
 
@@ -265,14 +263,14 @@ namespace osu.Framework.Tests.Visual.Containers
                         Size = new Vector2(250, 250)
                     });
 
-                    addCornerMarkers(box, 10, Color4.YellowGreen);
+                    addCornerMarkers(box, 10, Colour4.YellowGreen);
 
                     for (int i = 0; i < 100; i++)
                     {
                         box.Add(box = new InfofulBox
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = new Color4(253, 253, 253, 255),
+                            Colour = new Colour4(253, 253, 253, 255),
                             Origin = Anchor.BottomRight,
                             Anchor = Anchor.BottomRight,
                             Size = new Vector2(0.99f, 0.99f)
@@ -287,7 +285,7 @@ namespace osu.Framework.Tests.Visual.Containers
                         Size = new Vector2(50, 50),
                         Origin = Anchor.BottomRight,
                         Anchor = Anchor.BottomRight,
-                        Colour = Color4.SeaGreen,
+                        Colour = Colour4.SeaGreen,
                     });
                     break;
 
@@ -304,7 +302,7 @@ namespace osu.Framework.Tests.Visual.Containers
                         Size = new Vector2(300, 80),
                         Origin = Anchor.TopLeft,
                         Anchor = Anchor.TopLeft,
-                        Colour = Color4.OrangeRed,
+                        Colour = Colour4.OrangeRed,
                     });
 
                     box.Add(new SpriteText
@@ -337,7 +335,7 @@ namespace osu.Framework.Tests.Visual.Containers
                         Size = new Vector2(300, 80),
                         Origin = Anchor.TopLeft,
                         Anchor = Anchor.TopLeft,
-                        Colour = Color4.OrangeRed,
+                        Colour = Colour4.OrangeRed,
                     });
 
                     box.Add(new SpriteText
@@ -367,7 +365,7 @@ namespace osu.Framework.Tests.Visual.Containers
 
                     box.Add(box = new InfofulBoxAutoSize
                     {
-                        Colour = Color4.OrangeRed,
+                        Colour = Colour4.OrangeRed,
                         Position = new Vector2(100, 100),
                         Origin = Anchor.Centre,
                         Anchor = Anchor.TopLeft
@@ -379,7 +377,7 @@ namespace osu.Framework.Tests.Visual.Containers
                         Size = new Vector2(100, 100),
                         Origin = Anchor.Centre,
                         Anchor = Anchor.TopLeft,
-                        Colour = Color4.OrangeRed,
+                        Colour = Colour4.OrangeRed,
                     });
                     break;
 
@@ -398,7 +396,7 @@ namespace osu.Framework.Tests.Visual.Containers
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = Color4.AliceBlue,
+                                Colour = Colour4.AliceBlue,
                                 Alpha = 0.2f
                             },
                             boxes = new FillFlowContainer
@@ -419,7 +417,7 @@ namespace osu.Framework.Tests.Visual.Containers
                             Anchor = Anchor.TopCentre,
                             Origin = Anchor.TopCentre,
                             Size = new Vector2(0.9f, 40),
-                            Colour = Color4.AliceBlue,
+                            Colour = Colour4.AliceBlue,
                             Alpha = 0.2f
                         });
                     }
@@ -468,7 +466,7 @@ namespace osu.Framework.Tests.Visual.Containers
                                                         Anchor = Anchor.TopLeft,
                                                         Origin = Anchor.TopLeft,
                                                         Size = new Vector2(50),
-                                                        Colour = Color4.Blue,
+                                                        Colour = Colour4.Blue,
                                                     },
                                                 }
                                             }
@@ -500,7 +498,7 @@ namespace osu.Framework.Tests.Visual.Containers
                                                         Anchor = Anchor.Centre,
                                                         Origin = Anchor.Centre,
                                                         Size = new Vector2(50),
-                                                        Colour = Color4.Blue,
+                                                        Colour = Colour4.Blue,
                                                     },
                                                 }
                                             }
@@ -532,7 +530,7 @@ namespace osu.Framework.Tests.Visual.Containers
                                                         Anchor = Anchor.BottomRight,
                                                         Origin = Anchor.BottomRight,
                                                         Size = new Vector2(50),
-                                                        Colour = Color4.Blue,
+                                                        Colour = Colour4.Blue,
                                                     },
                                                 }
                                             }
@@ -590,7 +588,7 @@ namespace osu.Framework.Tests.Visual.Containers
                                                         Anchor = Anchor.TopLeft,
                                                         Origin = Anchor.TopLeft,
                                                         Size = new Vector2(50),
-                                                        Colour = Color4.Blue,
+                                                        Colour = Colour4.Blue,
                                                     },
                                                 }
                                             }
@@ -622,7 +620,7 @@ namespace osu.Framework.Tests.Visual.Containers
                                                         Anchor = Anchor.Centre,
                                                         Origin = Anchor.Centre,
                                                         Size = new Vector2(50),
-                                                        Colour = Color4.Blue,
+                                                        Colour = Colour4.Blue,
                                                     },
                                                 }
                                             }
@@ -654,7 +652,7 @@ namespace osu.Framework.Tests.Visual.Containers
                                                         Anchor = Anchor.BottomRight,
                                                         Origin = Anchor.BottomRight,
                                                         Size = new Vector2(50),
-                                                        Colour = Color4.Blue,
+                                                        Colour = Colour4.Blue,
                                                     },
                                                 }
                                             }
@@ -712,7 +710,7 @@ namespace osu.Framework.Tests.Visual.Containers
                                                         Anchor = Anchor.TopLeft,
                                                         Origin = Anchor.TopLeft,
                                                         Size = new Vector2(50),
-                                                        Colour = Color4.Blue,
+                                                        Colour = Colour4.Blue,
                                                     },
                                                 }
                                             }
@@ -744,7 +742,7 @@ namespace osu.Framework.Tests.Visual.Containers
                                                         Anchor = Anchor.Centre,
                                                         Origin = Anchor.Centre,
                                                         Size = new Vector2(50),
-                                                        Colour = Color4.Blue,
+                                                        Colour = Colour4.Blue,
                                                     },
                                                 }
                                             }
@@ -776,7 +774,7 @@ namespace osu.Framework.Tests.Visual.Containers
                                                         Anchor = Anchor.BottomRight,
                                                         Origin = Anchor.BottomRight,
                                                         Size = new Vector2(50),
-                                                        Colour = Color4.Blue,
+                                                        Colour = Colour4.Blue,
                                                     },
                                                 }
                                             }
@@ -834,7 +832,7 @@ namespace osu.Framework.Tests.Visual.Containers
                                                         Anchor = Anchor.TopLeft,
                                                         Origin = Anchor.TopLeft,
                                                         Size = new Vector2(50),
-                                                        Colour = Color4.Blue,
+                                                        Colour = Colour4.Blue,
                                                     },
                                                 }
                                             }
@@ -866,7 +864,7 @@ namespace osu.Framework.Tests.Visual.Containers
                                                         Anchor = Anchor.Centre,
                                                         Origin = Anchor.Centre,
                                                         Size = new Vector2(50),
-                                                        Colour = Color4.Blue,
+                                                        Colour = Colour4.Blue,
                                                     },
                                                 }
                                             }
@@ -898,7 +896,7 @@ namespace osu.Framework.Tests.Visual.Containers
                                                         Anchor = Anchor.BottomRight,
                                                         Origin = Anchor.BottomRight,
                                                         Size = new Vector2(50),
-                                                        Colour = Color4.Blue,
+                                                        Colour = Colour4.Blue,
                                                     },
                                                 }
                                             }
@@ -932,7 +930,7 @@ namespace osu.Framework.Tests.Visual.Containers
                                 Origin = Anchor.Centre,
                                 Children = new Drawable[]
                                 {
-                                    new Box { Colour = Color4.Gray, RelativeSizeAxes = Axes.Both },
+                                    new Box { Colour = Colour4.Gray, RelativeSizeAxes = Axes.Both },
                                     new Container
                                     {
                                         AutoSizeAxes = Axes.Both,
@@ -943,7 +941,7 @@ namespace osu.Framework.Tests.Visual.Containers
                                             // defines the size of autosize
                                             sizedBox = new Box
                                             {
-                                                Colour = Color4.Red,
+                                                Colour = Colour4.Red,
                                                 Anchor = Anchor.Centre,
                                                 Origin = Anchor.Centre,
                                                 Size = new Vector2(100f)
@@ -951,7 +949,7 @@ namespace osu.Framework.Tests.Visual.Containers
                                             // gets relative size based on autosize
                                             new Box
                                             {
-                                                Colour = Color4.Black,
+                                                Colour = Colour4.Black,
                                                 RelativeSizeAxes = Axes.Both,
                                                 Size = new Vector2(0.5f)
                                             },
@@ -1014,7 +1012,7 @@ namespace osu.Framework.Tests.Visual.Containers
             }
         }
 
-        private void addCornerMarkers(Container box, int size = 50, Color4? colour = null)
+        private void addCornerMarkers(Container box, int size = 50, Colour4? colour = null)
         {
             box.Add(new InfofulBox
             {
@@ -1024,7 +1022,7 @@ namespace osu.Framework.Tests.Visual.Containers
                 Anchor = Anchor.TopLeft,
                 AllowDrag = false,
                 Depth = -2,
-                Colour = colour ?? Color4.Red,
+                Colour = colour ?? Colour4.Red,
             });
 
             box.Add(new InfofulBox
@@ -1035,7 +1033,7 @@ namespace osu.Framework.Tests.Visual.Containers
                 Anchor = Anchor.TopRight,
                 AllowDrag = false,
                 Depth = -2,
-                Colour = colour ?? Color4.Red,
+                Colour = colour ?? Colour4.Red,
             });
 
             box.Add(new InfofulBox
@@ -1046,7 +1044,7 @@ namespace osu.Framework.Tests.Visual.Containers
                 Anchor = Anchor.BottomLeft,
                 AllowDrag = false,
                 Depth = -2,
-                Colour = colour ?? Color4.Red,
+                Colour = colour ?? Colour4.Red,
             });
 
             box.Add(new InfofulBox
@@ -1057,7 +1055,7 @@ namespace osu.Framework.Tests.Visual.Containers
                 Anchor = Anchor.BottomRight,
                 AllowDrag = false,
                 Depth = -2,
-                Colour = colour ?? Color4.Red,
+                Colour = colour ?? Colour4.Red,
             });
         }
 
@@ -1090,7 +1088,7 @@ namespace osu.Framework.Tests.Visual.Containers
                     {
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,
-                        Colour = Color4.Red,
+                        Colour = Colour4.Red,
                         BypassAutoSizeAxes = Axes.Both
                     }
                 };

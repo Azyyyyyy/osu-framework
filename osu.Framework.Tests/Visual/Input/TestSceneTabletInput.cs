@@ -3,6 +3,7 @@
 
 #if NET5_0
 using System.Linq;
+using System.Numerics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -12,8 +13,6 @@ using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.Handlers.Tablet;
 using osu.Framework.Platform;
-using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Framework.Tests.Visual.Input
 {
@@ -76,7 +75,7 @@ namespace osu.Framework.Tests.Visual.Input
                     background = new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.DarkGreen,
+                        Colour = Colour4.DarkGreen,
                         Alpha = 0,
                         Child = new Box { RelativeSizeAxes = Axes.Both }
                     },
@@ -126,7 +125,7 @@ namespace osu.Framework.Tests.Visual.Input
                     background = new Container
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.DarkGreen,
+                        Colour = Colour4.DarkGreen,
                         Alpha = 0,
                         Child = new Box { RelativeSizeAxes = Axes.Both }
                     },

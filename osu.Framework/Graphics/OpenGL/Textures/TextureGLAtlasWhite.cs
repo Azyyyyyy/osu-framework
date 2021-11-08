@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics.Primitives;
-using osuTK.Graphics.ES30;
+using Silk.NET.OpenGL;
 
 namespace osu.Framework.Graphics.OpenGL.Textures
 {

@@ -3,11 +3,11 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using NUnit.Framework;
 using osu.Framework.Input;
 using osu.Framework.Testing;
-using osuTK;
-using osuTK.Input;
+using Silk.NET.Input;
 
 namespace osu.Framework.Tests.Visual.UserInterface
 {

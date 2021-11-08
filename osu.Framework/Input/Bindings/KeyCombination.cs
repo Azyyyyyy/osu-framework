@@ -6,11 +6,11 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Input.States;
-using osuTK;
-using osuTK.Input;
+using Silk.NET.Input;
 
 namespace osu.Framework.Input.Bindings
 {
@@ -574,21 +574,21 @@ namespace osu.Framework.Input.Bindings
         {
             switch (key)
             {
-                case Key.LShift: return InputKey.LShift;
+                case Key.ShiftLeft: return InputKey.LShift;
 
-                case Key.RShift: return InputKey.RShift;
+                case Key.ShiftRight: return InputKey.RShift;
 
-                case Key.LControl: return InputKey.LControl;
+                case Key.ControlLeft: return InputKey.LControl;
 
-                case Key.RControl: return InputKey.RControl;
+                case Key.ControlRight: return InputKey.RControl;
 
-                case Key.LAlt: return InputKey.LAlt;
+                case Key.AltLeft: return InputKey.LAlt;
 
-                case Key.RAlt: return InputKey.RAlt;
+                case Key.AltRight: return InputKey.RAlt;
 
-                case Key.LWin: return InputKey.LSuper;
+                case Key.SuperLeft: return InputKey.LSuper;
 
-                case Key.RWin: return InputKey.RSuper;
+                case Key.SuperRight: return InputKey.RSuper;
             }
 
             return (InputKey)key;

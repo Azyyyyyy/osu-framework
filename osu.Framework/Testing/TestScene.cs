@@ -4,6 +4,7 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
@@ -19,8 +20,6 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Platform;
 using osu.Framework.Testing.Drawables.Steps;
 using osu.Framework.Threading;
-using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Framework.Testing
 {
@@ -116,7 +115,7 @@ namespace osu.Framework.Testing
                 {
                     new Box
                     {
-                        Colour = new Color4(25, 25, 25, 255),
+                        Colour = new Colour4(25, 25, 25, 255),
                         RelativeSizeAxes = Axes.Y,
                         Width = steps_width,
                     },

@@ -3,6 +3,7 @@
 
 using System.Diagnostics;
 using System.Linq;
+using System.Numerics;
 using System.Reflection;
 using NUnit.Framework;
 using osu.Framework.Extensions.IEnumerableExtensions;
@@ -12,8 +13,6 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
-using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Framework.Tests.Visual.Sprites
 {
@@ -32,7 +31,7 @@ namespace osu.Framework.Tests.Visual.Sprites
                 {
                     background = new Box
                     {
-                        Colour = Color4.Teal,
+                        Colour = Colour4.Teal,
                         RelativeSizeAxes = Axes.Both,
                     },
                     new BasicScrollContainer
@@ -74,7 +73,7 @@ namespace osu.Framework.Tests.Visual.Sprites
 
             AddStep("toggle shadows", () => flow.Children.OfType<Icon>().ForEach(i => i.SpriteIcon.Shadow = !i.SpriteIcon.Shadow));
             AddStep("change icons", () => flow.Children.OfType<Icon>().ForEach(i => i.SpriteIcon.Icon = new IconUsage((char)(i.SpriteIcon.Icon.Icon + 1))));
-            AddStep("white background", () => background.FadeColour(Color4.White, 200));
+            AddStep("white background", () => background.FadeColour(Colour4.White, 200));
         }
 
         private class Icon : Container, IHasTooltip

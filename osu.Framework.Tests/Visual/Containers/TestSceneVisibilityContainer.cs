@@ -2,12 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using System.Numerics;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Framework.Tests.Visual.Containers
 {
@@ -134,11 +133,11 @@ namespace osu.Framework.Tests.Visual.Containers
             public TestNestedVisibilityContainer(bool startHidden = true)
                 : base(startHidden)
             {
-                Add(nested = new TestVisibilityContainer(true, Color4.Yellow));
+                Add(nested = new TestVisibilityContainer(true, Colour4.Yellow));
 
                 nested.Add(box = new Box
                 {
-                    Colour = Color4.Black,
+                    Colour = Colour4.Black,
                     RelativeSizeAxes = Axes.Both,
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
@@ -167,7 +166,7 @@ namespace osu.Framework.Tests.Visual.Containers
 
             protected override bool StartHidden => startHidden ?? base.StartHidden;
 
-            public TestVisibilityContainer(bool? startHidden = true, Color4? colour = null)
+            public TestVisibilityContainer(bool? startHidden = true, Colour4? colour = null)
             {
                 this.startHidden = startHidden;
 
@@ -181,7 +180,7 @@ namespace osu.Framework.Tests.Visual.Containers
                 {
                     new Box
                     {
-                        Colour = colour ?? Color4.Cyan,
+                        Colour = colour ?? Colour4.Cyan,
                         RelativeSizeAxes = Axes.Both,
                     },
                 };

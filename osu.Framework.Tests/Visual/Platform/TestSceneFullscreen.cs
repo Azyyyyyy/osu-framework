@@ -3,6 +3,7 @@
 
 using System.Drawing;
 using System.Linq;
+using System.Numerics;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
@@ -15,7 +16,6 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
-using osuTK;
 
 namespace osu.Framework.Tests.Visual.Platform
 {

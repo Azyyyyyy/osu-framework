@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Numerics;
 using JetBrains.Annotations;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.EnumExtensions;
@@ -12,7 +13,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
-using osuTK;
 
 namespace osu.Framework.Graphics.UserInterface
 {

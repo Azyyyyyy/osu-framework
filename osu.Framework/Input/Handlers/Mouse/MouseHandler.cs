@@ -2,13 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Diagnostics;
+using System.Numerics;
 using osu.Framework.Bindables;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Input.StateChanges;
 using osu.Framework.Platform;
 using osu.Framework.Statistics;
-using osuTK;
-using osuTK.Input;
+using Silk.NET.Input;
 
 namespace osu.Framework.Input.Handlers.Mouse
 {
@@ -43,7 +43,7 @@ namespace osu.Framework.Input.Handlers.Mouse
 
         private IBindable<bool> isActive;
         private IBindable<bool> cursorInWindow;
-        private Bindable<CursorState> cursorState;
+        private Bindable<CursorMode> cursorState;
 
         /// <summary>
         /// Whether a non-relative mouse event has ever been received.
@@ -54,7 +54,7 @@ namespace osu.Framework.Input.Handlers.Mouse
         /// <summary>
         /// Whether the application should be handling the cursor.
         /// </summary>
-        private bool cursorCaptured => isActive.Value && (window.CursorInWindow.Value || window.CursorState.HasFlagFast(CursorState.Confined));
+        private bool cursorCaptured => isActive.Value && (window.CursorInWindow.Value || window.CursorState.HasFlagFast(CursorMode.Raw));
 
         /// <summary>
         /// Whether the last position (as reported by <see cref="FeedbackMousePositionChange"/>)
@@ -160,7 +160,7 @@ namespace osu.Framework.Input.Handlers.Mouse
 
                 // handle the case where relative / raw input is active, but the cursor may have exited the window
                 // bounds and is not intended to be confined.
-                if (!window.CursorState.HasFlagFast(CursorState.Confined) && positionOutsideWindow && !previousPositionOutsideWindow)
+                if (!window.CursorState.HasFlagFast(CursorMode.Raw) && positionOutsideWindow && !previousPositionOutsideWindow)
                 {
                     // setting relative mode to false will allow the window manager to take control until the next
                     // updateRelativeMode() call succeeds (likely from the cursor returning inside the window).
@@ -190,7 +190,7 @@ namespace osu.Framework.Input.Handlers.Mouse
                 // relative mode only works when the window is active and the cursor is contained. aka the OS cursor isn't being displayed outside the window.
                 && cursorCaptured
                 // relative mode shouldn't ever be enabled if the framework or a consumer has chosen not to hide the cursor.
-                && window.CursorState.HasFlagFast(CursorState.Hidden);
+                && window.CursorState.HasFlagFast(CursorMode.Raw);
 
             if (!window.RelativeMouseMode)
                 transferLastPositionToHostCursor();

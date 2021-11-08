@@ -6,10 +6,9 @@ using System.Collections.Generic;
 using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Numerics;
 using System.Runtime.ExceptionServices;
 using System.Threading;
-using osuTK;
-using osuTK.Graphics;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Extensions.IEnumerableExtensions;
 using osu.Framework.Graphics.Colour;
@@ -1294,15 +1293,15 @@ namespace osu.Framework.Graphics.Containers
         /// </summary>
         protected TransformSequence<CompositeDrawable> FadeEdgeEffectTo(float newAlpha, double duration = 0, Easing easing = Easing.None)
         {
-            Color4 targetColour = EdgeEffect.Colour;
-            targetColour.A = newAlpha;
+            Colour4 targetColour = EdgeEffect.Colour;
+            targetColour = targetColour.Opacity(newAlpha);
             return FadeEdgeEffectTo(targetColour, duration, easing);
         }
 
         /// <summary>
         /// Helper function for creating and adding a <see cref="Transform{TValue, T}"/> that fades the current <see cref="EdgeEffect"/>.
         /// </summary>
-        protected TransformSequence<CompositeDrawable> FadeEdgeEffectTo(Color4 newColour, double duration = 0, Easing easing = Easing.None)
+        protected TransformSequence<CompositeDrawable> FadeEdgeEffectTo(Colour4 newColour, double duration = 0, Easing easing = Easing.None)
         {
             var effect = EdgeEffect;
             effect.Colour = newColour;
@@ -1502,7 +1501,7 @@ namespace osu.Framework.Graphics.Containers
             }
         }
 
-        private SRGBColour borderColour = Color4.Black;
+        private SRGBColour borderColour = Colour4.Black;
 
         /// <summary>
         /// Determines the color of the border controlled by <see cref="BorderThickness"/>.

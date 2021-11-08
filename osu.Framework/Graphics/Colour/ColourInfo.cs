@@ -2,10 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osuTK;
 using osu.Framework.Graphics.Primitives;
 using System.Diagnostics;
-using osuTK.Graphics;
+using System.Numerics;
 
 namespace osu.Framework.Graphics.Colour
 {
@@ -218,9 +217,6 @@ namespace osu.Framework.Graphics.Colour
 
         public static implicit operator ColourInfo(SRGBColour colour) => SingleColour(colour);
         public static implicit operator SRGBColour(ColourInfo colour) => colour.singleColour;
-
-        public static implicit operator ColourInfo(Color4 colour) => (SRGBColour)colour;
-        public static implicit operator Color4(ColourInfo colour) => (SRGBColour)colour;
 
         public static implicit operator ColourInfo(Colour4 colour) => (SRGBColour)colour;
         public static implicit operator Colour4(ColourInfo colour) => (SRGBColour)colour;

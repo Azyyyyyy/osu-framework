@@ -7,6 +7,7 @@ using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Platform;
 using osu.Framework.Testing;
+using Silk.NET.Input;
 
 namespace osu.Framework.Tests
 {
@@ -32,7 +33,7 @@ namespace osu.Framework.Tests
         public override void SetHost(GameHost host)
         {
             base.SetHost(host);
-            host.Window.CursorState |= CursorState.Hidden;
+            host.Window.CursorState |= CursorMode.Hidden;
         }
     }
 }

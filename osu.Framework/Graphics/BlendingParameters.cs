@@ -3,7 +3,7 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
-using osuTK.Graphics.ES30;
+using Silk.NET.OpenGL;
 
 namespace osu.Framework.Graphics
 {
@@ -175,156 +175,156 @@ namespace osu.Framework.Graphics
         #region GL Type Getters
 
         /// <summary>
-        /// Gets the <see cref="BlendEquationMode"/> for the currently specified RGB Equation.
+        /// Gets the <see cref="BlendingEquation"/> for the currently specified RGB Equation.
         /// </summary>
-        public readonly BlendEquationMode RGBEquationMode => translateEquation(RGBEquation);
+        public readonly BlendEquationModeEXT RGBEquationMode => translateEquation(RGBEquation);
 
         /// <summary>
-        /// Gets the <see cref="BlendEquationMode"/> for the currently specified Alpha Equation.
+        /// Gets the <see cref="BlendingEquation"/> for the currently specified Alpha Equation.
         /// </summary>
-        public readonly BlendEquationMode AlphaEquationMode => translateEquation(AlphaEquation);
+        public readonly BlendEquationModeEXT AlphaEquationMode => translateEquation(AlphaEquation);
 
         /// <summary>
-        /// Gets the <see cref="BlendingFactorSrc"/> for the currently specified source blending mode.
+        /// Gets the <see cref="BlendingFactor"/> for the currently specified source blending mode.
         /// </summary>
-        public readonly BlendingFactorSrc SourceBlendingFactor => translateBlendingFactorSrc(Source);
+        public readonly BlendingFactor SourceBlendingFactor => translateBlendingFactorSrc(Source);
 
         /// <summary>
-        /// Gets the <see cref="BlendingFactorDest"/> for the currently specified destination blending mode.
+        /// Gets the <see cref="BlendingFactor"/> for the currently specified destination blending mode.
         /// </summary>
-        public readonly BlendingFactorDest DestinationBlendingFactor => translateBlendingFactorDest(Destination);
+        public readonly BlendingFactor DestinationBlendingFactor => translateBlendingFactorDest(Destination);
 
         /// <summary>
-        /// Gets the <see cref="BlendingFactorSrc"/> for the currently specified source alpha mode.
+        /// Gets the <see cref="BlendingFactor"/> for the currently specified source alpha mode.
         /// </summary>
-        public readonly BlendingFactorSrc SourceAlphaBlendingFactor => translateBlendingFactorSrc(SourceAlpha);
+        public readonly BlendingFactor SourceAlphaBlendingFactor => translateBlendingFactorSrc(SourceAlpha);
 
         /// <summary>
-        /// Gets the <see cref="BlendingFactorDest"/> for the currently specified destination alpha mode.
+        /// Gets the <see cref="BlendingFactor"/> for the currently specified destination alpha mode.
         /// </summary>
-        public readonly BlendingFactorDest DestinationAlphaBlendingFactor => translateBlendingFactorDest(DestinationAlpha);
+        public readonly BlendingFactor DestinationAlphaBlendingFactor => translateBlendingFactorDest(DestinationAlpha);
 
-        private static BlendingFactorSrc translateBlendingFactorSrc(BlendingType factor)
+        private static BlendingFactor translateBlendingFactorSrc(BlendingType factor)
         {
             switch (factor)
             {
                 case BlendingType.ConstantAlpha:
-                    return BlendingFactorSrc.ConstantAlpha;
+                    return BlendingFactor.ConstantAlpha;
 
                 case BlendingType.ConstantColor:
-                    return BlendingFactorSrc.ConstantColor;
+                    return BlendingFactor.ConstantColor;
 
                 case BlendingType.DstAlpha:
-                    return BlendingFactorSrc.DstAlpha;
+                    return BlendingFactor.SrcAlpha;
 
                 case BlendingType.DstColor:
-                    return BlendingFactorSrc.DstColor;
+                    return BlendingFactor.SrcColor;
 
                 case BlendingType.One:
-                    return BlendingFactorSrc.One;
+                    return BlendingFactor.One;
 
                 case BlendingType.OneMinusConstantAlpha:
-                    return BlendingFactorSrc.OneMinusConstantAlpha;
+                    return BlendingFactor.OneMinusConstantAlpha;
 
                 case BlendingType.OneMinusConstantColor:
-                    return BlendingFactorSrc.OneMinusConstantColor;
+                    return BlendingFactor.OneMinusConstantColor;
 
                 case BlendingType.OneMinusDstAlpha:
-                    return BlendingFactorSrc.OneMinusDstAlpha;
+                    return BlendingFactor.OneMinusDstAlpha;
 
                 case BlendingType.OneMinusDstColor:
-                    return BlendingFactorSrc.OneMinusDstColor;
+                    return BlendingFactor.OneMinusDstColor;
 
                 case BlendingType.OneMinusSrcAlpha:
-                    return BlendingFactorSrc.OneMinusSrcColor;
+                    return BlendingFactor.OneMinusSrcColor;
 
                 case BlendingType.SrcAlpha:
-                    return BlendingFactorSrc.SrcAlpha;
+                    return BlendingFactor.SrcAlpha;
 
                 case BlendingType.SrcAlphaSaturate:
-                    return BlendingFactorSrc.SrcAlphaSaturate;
+                    return BlendingFactor.SrcAlphaSaturate;
 
                 case BlendingType.SrcColor:
-                    return BlendingFactorSrc.SrcColor;
+                    return BlendingFactor.SrcColor;
 
                 default:
                 case BlendingType.Zero:
-                    return BlendingFactorSrc.Zero;
+                    return BlendingFactor.Zero;
             }
         }
 
-        private static BlendingFactorDest translateBlendingFactorDest(BlendingType factor)
+        private static BlendingFactor translateBlendingFactorDest(BlendingType factor)
         {
             switch (factor)
             {
                 case BlendingType.ConstantAlpha:
-                    return BlendingFactorDest.ConstantAlpha;
+                    return BlendingFactor.DstAlpha;
 
                 case BlendingType.ConstantColor:
-                    return BlendingFactorDest.ConstantColor;
+                    return BlendingFactor.ConstantColor;
 
                 case BlendingType.DstAlpha:
-                    return BlendingFactorDest.DstAlpha;
+                    return BlendingFactor.DstAlpha;
 
                 case BlendingType.DstColor:
-                    return BlendingFactorDest.DstColor;
+                    return BlendingFactor.DstColor;
 
                 case BlendingType.One:
-                    return BlendingFactorDest.One;
+                    return BlendingFactor.One;
 
                 case BlendingType.OneMinusConstantAlpha:
-                    return BlendingFactorDest.OneMinusConstantAlpha;
+                    return BlendingFactor.OneMinusConstantAlpha;
 
                 case BlendingType.OneMinusConstantColor:
-                    return BlendingFactorDest.OneMinusConstantColor;
+                    return BlendingFactor.OneMinusConstantColor;
 
                 case BlendingType.OneMinusDstAlpha:
-                    return BlendingFactorDest.OneMinusDstAlpha;
+                    return BlendingFactor.OneMinusDstAlpha;
 
                 case BlendingType.OneMinusDstColor:
-                    return BlendingFactorDest.OneMinusDstColor;
+                    return BlendingFactor.OneMinusDstColor;
 
                 case BlendingType.OneMinusSrcAlpha:
-                    return BlendingFactorDest.OneMinusSrcAlpha;
+                    return BlendingFactor.OneMinusSrcAlpha;
 
                 case BlendingType.OneMinusSrcColor:
-                    return BlendingFactorDest.OneMinusSrcColor;
+                    return BlendingFactor.OneMinusSrcColor;
 
                 case BlendingType.SrcAlpha:
-                    return BlendingFactorDest.SrcAlpha;
+                    return BlendingFactor.DstAlpha;
 
                 case BlendingType.SrcAlphaSaturate:
-                    return BlendingFactorDest.SrcAlphaSaturate;
+                    return BlendingFactor.DstAlpha;
 
                 case BlendingType.SrcColor:
-                    return BlendingFactorDest.SrcColor;
+                    return BlendingFactor.DstColor;
 
                 default:
                 case BlendingType.Zero:
-                    return BlendingFactorDest.Zero;
+                    return BlendingFactor.Zero;
             }
         }
 
-        private static BlendEquationMode translateEquation(BlendingEquation blendingEquation)
+        private static BlendEquationModeEXT translateEquation(BlendingEquation blendingEquation)
         {
             switch (blendingEquation)
             {
                 default:
                 case BlendingEquation.Inherit:
                 case BlendingEquation.Add:
-                    return BlendEquationMode.FuncAdd;
+                    return BlendEquationModeEXT.FuncAdd;
 
                 case BlendingEquation.Min:
-                    return BlendEquationMode.Min;
+                    return BlendEquationModeEXT.Min;
 
                 case BlendingEquation.Max:
-                    return BlendEquationMode.Max;
+                    return BlendEquationModeEXT.Max;
 
                 case BlendingEquation.Subtract:
-                    return BlendEquationMode.FuncSubtract;
+                    return BlendEquationModeEXT.FuncSubtract;
 
                 case BlendingEquation.ReverseSubtract:
-                    return BlendEquationMode.FuncReverseSubtract;
+                    return BlendEquationModeEXT.FuncReverseSubtract;
             }
         }
 

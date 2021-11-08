@@ -8,7 +8,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Text;
-using osuTK.Graphics;
 
 namespace osu.Framework.Tests.Visual.Sprites
 {
@@ -112,7 +111,7 @@ namespace osu.Framework.Tests.Visual.Sprites
                     {
                         RelativeSizeAxes = Axes.Both,
                         Alpha = 0.2f,
-                        Colour = Color4.Pink
+                        Colour = Colour4.Pink
                     },
                     Text = new TestSpriteText { AllowMultiline = false }
                 };

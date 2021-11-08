@@ -2,14 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Numerics;
 using ManagedBass;
 using ManagedBass.Mix;
 using osu.Framework.Audio;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Framework.Graphics.Visualisation.Audio
 {
@@ -66,7 +65,7 @@ namespace osu.Framework.Graphics.Visualisation.Audio
                                     Origin = Anchor.BottomLeft,
                                     RelativeSizeAxes = Axes.Y,
                                     Width = 30,
-                                    Colour = Color4.YellowGreen
+                                    Colour = Colour4.YellowGreen
                                 },
                                 volBarR = new Box
                                 {
@@ -74,7 +73,7 @@ namespace osu.Framework.Graphics.Visualisation.Audio
                                     Origin = Anchor.BottomLeft,
                                     RelativeSizeAxes = Axes.Y,
                                     Width = 30,
-                                    Colour = Color4.YellowGreen
+                                    Colour = Colour4.YellowGreen
                                 }
                             }
                         }

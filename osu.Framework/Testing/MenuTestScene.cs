@@ -7,7 +7,7 @@ using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.UserInterface;
-using osuTK.Input;
+using Silk.NET.Input;
 
 namespace osu.Framework.Testing
 {

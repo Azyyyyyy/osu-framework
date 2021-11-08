@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
@@ -9,8 +10,6 @@ using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
-using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Framework.Tests.Visual.Drawables
 {
@@ -70,7 +69,7 @@ namespace osu.Framework.Tests.Visual.Drawables
             public DelayedTestBox()
             {
                 Size = new Vector2(50);
-                Colour = Color4.Blue;
+                Colour = Colour4.Blue;
             }
 
             [BackgroundDependencyLoader]
@@ -85,7 +84,7 @@ namespace osu.Framework.Tests.Visual.Drawables
             public DelayedTestBoxAsync()
             {
                 Size = new Vector2(50);
-                Colour = Color4.Green;
+                Colour = Colour4.Green;
             }
 
             [BackgroundDependencyLoader]

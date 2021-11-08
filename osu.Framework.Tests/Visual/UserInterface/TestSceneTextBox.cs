@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using System.Numerics;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -11,9 +12,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
-using osuTK;
-using osuTK.Graphics;
-using osuTK.Input;
+using Silk.NET.Input;
 
 namespace osu.Framework.Tests.Visual.UserInterface
 {
@@ -284,7 +283,7 @@ namespace osu.Framework.Tests.Visual.UserInterface
                 textBox.Text += "a";
             });
 
-            AddStep("backspace character", () => InputManager.Key(Key.BackSpace));
+            AddStep("backspace character", () => InputManager.Key(Key.Backspace));
             AddAssert("character removed", () => textBox.Text == string.Empty);
 
             AddStep("shift down", () => InputManager.PressKey(Key.ShiftLeft));
@@ -295,7 +294,7 @@ namespace osu.Framework.Tests.Visual.UserInterface
                 textBox.Text += "A";
             });
 
-            AddStep("backspace character", () => InputManager.Key(Key.BackSpace));
+            AddStep("backspace character", () => InputManager.Key(Key.Backspace));
             AddAssert("character removed", () => textBox.Text == string.Empty);
 
             AddStep("shift up", () => InputManager.ReleaseKey(Key.ShiftLeft));
@@ -773,13 +772,13 @@ namespace osu.Framework.Tests.Visual.UserInterface
                     RelativeSizeAxes = Axes.Y;
 
                     Masking = true;
-                    BorderColour = Color4.White;
+                    BorderColour = Colour4.White;
                     BorderThickness = 3;
 
                     InternalChild = new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Transparent
+                        Colour = Colour4.Transparent
                     };
                 }
 

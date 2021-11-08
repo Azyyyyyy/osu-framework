@@ -1,227 +1,228 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
-using osuTK.Graphics.ES30;
+using Silk.NET.OpenGL;
 
 namespace osu.Framework.Graphics.OpenGL.Buffers
 {
     public static class BufferFormatExtensions
     {
-        public static FramebufferAttachment GetAttachmentType(this RenderbufferInternalFormat format)
+        public static FramebufferAttachment GetAttachmentType(this InternalFormat format)
         {
             switch (format)
             {
-                case RenderbufferInternalFormat.R8:
-                case RenderbufferInternalFormat.R8Snorm:
-                case RenderbufferInternalFormat.R16f:
-                case RenderbufferInternalFormat.R32f:
-                case RenderbufferInternalFormat.R8ui:
-                case RenderbufferInternalFormat.R8i:
-                case RenderbufferInternalFormat.R16ui:
-                case RenderbufferInternalFormat.R16i:
-                case RenderbufferInternalFormat.R32ui:
-                case RenderbufferInternalFormat.R32i:
-                case RenderbufferInternalFormat.Rg8:
-                case RenderbufferInternalFormat.Rg8Snorm:
-                case RenderbufferInternalFormat.Rg16f:
-                case RenderbufferInternalFormat.Rg32f:
-                case RenderbufferInternalFormat.Rg8ui:
-                case RenderbufferInternalFormat.Rg8i:
-                case RenderbufferInternalFormat.Rg16ui:
-                case RenderbufferInternalFormat.Rg16i:
-                case RenderbufferInternalFormat.Rg32ui:
-                case RenderbufferInternalFormat.Rg32i:
-                case RenderbufferInternalFormat.Rgb8:
-                case RenderbufferInternalFormat.Srgb8:
-                case RenderbufferInternalFormat.Rgb565:
-                case RenderbufferInternalFormat.Rgb8Snorm:
-                case RenderbufferInternalFormat.R11fG11fB10f:
-                case RenderbufferInternalFormat.Rgb9E5:
-                case RenderbufferInternalFormat.Rgb16f:
-                case RenderbufferInternalFormat.Rgb32f:
-                case RenderbufferInternalFormat.Rgb8ui:
-                case RenderbufferInternalFormat.Rgb8i:
-                case RenderbufferInternalFormat.Rgb16ui:
-                case RenderbufferInternalFormat.Rgb16i:
-                case RenderbufferInternalFormat.Rgb32ui:
-                case RenderbufferInternalFormat.Rgb32i:
-                case RenderbufferInternalFormat.Rgba8:
-                case RenderbufferInternalFormat.Srgb8Alpha8:
-                case RenderbufferInternalFormat.Rgba8Snorm:
-                case RenderbufferInternalFormat.Rgb5A1:
-                case RenderbufferInternalFormat.Rgba4:
-                case RenderbufferInternalFormat.Rgb10A2:
-                case RenderbufferInternalFormat.Rgba16f:
-                case RenderbufferInternalFormat.Rgba32f:
-                case RenderbufferInternalFormat.Rgba8i:
-                case RenderbufferInternalFormat.Rgba8ui:
-                case RenderbufferInternalFormat.Rgb10A2ui:
-                case RenderbufferInternalFormat.Rgba16i:
-                case RenderbufferInternalFormat.Rgba16ui:
-                case RenderbufferInternalFormat.Rgba32i:
-                case RenderbufferInternalFormat.Rgba32ui:
+                case InternalFormat.R8:
+                case InternalFormat.R8SNorm:
+                case InternalFormat.R16f:
+                case InternalFormat.R32f:
+                case InternalFormat.R8ui:
+                case InternalFormat.R8i:
+                case InternalFormat.R16ui:
+                case InternalFormat.R16i:
+                case InternalFormat.R32ui:
+                case InternalFormat.R32i:
+                case InternalFormat.RG8:
+                case InternalFormat.RG8SNorm:
+                case InternalFormat.RG16f:
+                case InternalFormat.RG32f:
+                case InternalFormat.RG8ui:
+                case InternalFormat.RG8i:
+                case InternalFormat.RG16ui:
+                case InternalFormat.RG16i:
+                case InternalFormat.RG32ui:
+                case InternalFormat.RG32i:
+                case InternalFormat.Rgb8:
+                case InternalFormat.Srgb8:
+                case InternalFormat.Rgb565:
+                case InternalFormat.Rgb8SNorm:
+                case InternalFormat.R11fG11fB10f:
+                case InternalFormat.Rgb9E5:
+                case InternalFormat.Rgb16f:
+                case InternalFormat.Rgb32f:
+                case InternalFormat.Rgb8ui:
+                case InternalFormat.Rgb8i:
+                case InternalFormat.Rgb16ui:
+                case InternalFormat.Rgb16i:
+                case InternalFormat.Rgb32ui:
+                case InternalFormat.Rgb32i:
+                case InternalFormat.Rgba8:
+                case InternalFormat.Srgb8Alpha8:
+                case InternalFormat.Rgba8SNorm:
+                case InternalFormat.Rgb5A1:
+                case InternalFormat.Rgba4:
+                case InternalFormat.Rgb10A2:
+                case InternalFormat.Rgba16f:
+                case InternalFormat.Rgba32f:
+                case InternalFormat.Rgba8i:
+                case InternalFormat.Rgba8ui:
+                case InternalFormat.Rgb10A2ui:
+                case InternalFormat.Rgba16i:
+                case InternalFormat.Rgba16ui:
+                case InternalFormat.Rgba32i:
+                case InternalFormat.Rgba32ui:
                     return FramebufferAttachment.ColorAttachment0;
 
-                case RenderbufferInternalFormat.DepthComponent16:
-                case RenderbufferInternalFormat.DepthComponent24:
-                case RenderbufferInternalFormat.DepthComponent32f:
+                case InternalFormat.DepthComponent16:
+                case InternalFormat.DepthComponent24:
+                case InternalFormat.DepthComponent32f:
                     return FramebufferAttachment.DepthAttachment;
 
-                case RenderbufferInternalFormat.StencilIndex8:
+                case InternalFormat.StencilIndex8:
                     return FramebufferAttachment.StencilAttachment;
 
-                case RenderbufferInternalFormat.Depth24Stencil8:
-                case RenderbufferInternalFormat.Depth32fStencil8:
-                    return FramebufferAttachment.DepthStencilAttachment;
+                //TODO: Find out if this is missing in Silk.NET or if I'm doing a dumb
+                //case RenderbufferInternalFormat.Depth24Stencil8:
+                //case RenderbufferInternalFormat.Depth32fStencil8:
+                //    return FramebufferAttachment.DepthStencilAttachment;
 
                 default:
-                    throw new InvalidOperationException($"{format} is not a valid {nameof(RenderbufferInternalFormat)} type.");
+                    throw new InvalidOperationException($"{format} is not a valid {nameof(InternalFormat)} type.");
             }
         }
 
-        public static int GetBytesPerPixel(this RenderbufferInternalFormat format)
+        public static int GetBytesPerPixel(this InternalFormat format)
         {
             // cross-reference: https://www.khronos.org/registry/OpenGL-Refpages/es3.0/html/glTexImage2D.xhtml
             switch (format)
             {
                 // GL_RED
-                case RenderbufferInternalFormat.R8:
-                case RenderbufferInternalFormat.R8Snorm:
+                case InternalFormat.R8:
+                case InternalFormat.R8SNorm:
                     return 1;
 
-                case RenderbufferInternalFormat.R16f:
+                case InternalFormat.R16f:
                     return 2;
 
-                case RenderbufferInternalFormat.R32f:
+                case InternalFormat.R32f:
                     return 4;
 
                 // GL_RED_INTEGER
-                case RenderbufferInternalFormat.R8ui:
-                case RenderbufferInternalFormat.R8i:
+                case InternalFormat.R8ui:
+                case InternalFormat.R8i:
                     return 1;
 
-                case RenderbufferInternalFormat.R16ui:
-                case RenderbufferInternalFormat.R16i:
+                case InternalFormat.R16ui:
+                case InternalFormat.R16i:
                     return 2;
 
-                case RenderbufferInternalFormat.R32ui:
-                case RenderbufferInternalFormat.R32i:
+                case InternalFormat.R32ui:
+                case InternalFormat.R32i:
                     return 4;
 
                 // GL_RG
-                case RenderbufferInternalFormat.Rg8:
-                case RenderbufferInternalFormat.Rg8Snorm:
+                case InternalFormat.RG8:
+                case InternalFormat.RG8SNorm:
                     return 2;
 
-                case RenderbufferInternalFormat.Rg16f:
+                case InternalFormat.RG16f:
                     return 4;
 
-                case RenderbufferInternalFormat.Rg32f:
+                case InternalFormat.RG32f:
                     return 8;
 
                 // GL_RG_INTEGER
-                case RenderbufferInternalFormat.Rg8ui:
-                case RenderbufferInternalFormat.Rg8i:
+                case InternalFormat.RG8ui:
+                case InternalFormat.RG8i:
                     return 2;
 
-                case RenderbufferInternalFormat.Rg16ui:
-                case RenderbufferInternalFormat.Rg16i:
+                case InternalFormat.RG16ui:
+                case InternalFormat.RG16i:
                     return 4;
 
-                case RenderbufferInternalFormat.Rg32ui:
-                case RenderbufferInternalFormat.Rg32i:
+                case InternalFormat.RG32ui:
+                case InternalFormat.RG32i:
                     return 8;
 
                 // GL_RGB
-                case RenderbufferInternalFormat.Rgb8:
-                case RenderbufferInternalFormat.Srgb8:
+                case InternalFormat.Rgb8:
+                case InternalFormat.Srgb8:
                     return 3;
 
-                case RenderbufferInternalFormat.Rgb565:
+                case InternalFormat.Rgb565:
                     return 2;
 
-                case RenderbufferInternalFormat.Rgb8Snorm:
+                case InternalFormat.Rgb8SNorm:
                     return 3;
 
-                case RenderbufferInternalFormat.R11fG11fB10f:
-                case RenderbufferInternalFormat.Rgb9E5:
+                case InternalFormat.R11fG11fB10f:
+                case InternalFormat.Rgb9E5:
                     return 4;
 
-                case RenderbufferInternalFormat.Rgb16f:
+                case InternalFormat.Rgb16f:
                     return 6;
 
-                case RenderbufferInternalFormat.Rgb32f:
+                case InternalFormat.Rgb32f:
                     return 12;
 
                 // GL_RGB_INTEGER
-                case RenderbufferInternalFormat.Rgb8ui:
-                case RenderbufferInternalFormat.Rgb8i:
+                case InternalFormat.Rgb8ui:
+                case InternalFormat.Rgb8i:
                     return 3;
 
-                case RenderbufferInternalFormat.Rgb16ui:
-                case RenderbufferInternalFormat.Rgb16i:
+                case InternalFormat.Rgb16ui:
+                case InternalFormat.Rgb16i:
                     return 6;
 
-                case RenderbufferInternalFormat.Rgb32ui:
-                case RenderbufferInternalFormat.Rgb32i:
+                case InternalFormat.Rgb32ui:
+                case InternalFormat.Rgb32i:
                     return 12;
 
                 // GL_RGBA
-                case RenderbufferInternalFormat.Rgba8:
-                case RenderbufferInternalFormat.Srgb8Alpha8:
-                case RenderbufferInternalFormat.Rgba8Snorm:
+                case InternalFormat.Rgba8:
+                case InternalFormat.Srgb8Alpha8:
+                case InternalFormat.Rgba8SNorm:
                     return 4;
 
-                case RenderbufferInternalFormat.Rgb5A1:
-                case RenderbufferInternalFormat.Rgba4:
+                case InternalFormat.Rgb5A1:
+                case InternalFormat.Rgba4:
                     return 2;
 
-                case RenderbufferInternalFormat.Rgb10A2:
+                case InternalFormat.Rgb10A2:
                     return 4;
 
-                case RenderbufferInternalFormat.Rgba16f:
+                case InternalFormat.Rgba16f:
                     return 8;
 
-                case RenderbufferInternalFormat.Rgba32f:
+                case InternalFormat.Rgba32f:
                     return 16;
 
                 // GL_RGBA_INTEGER
-                case RenderbufferInternalFormat.Rgba8i:
-                case RenderbufferInternalFormat.Rgba8ui:
-                case RenderbufferInternalFormat.Rgb10A2ui:
+                case InternalFormat.Rgba8i:
+                case InternalFormat.Rgba8ui:
+                case InternalFormat.Rgb10A2ui:
                     return 4;
 
-                case RenderbufferInternalFormat.Rgba16i:
-                case RenderbufferInternalFormat.Rgba16ui:
+                case InternalFormat.Rgba16i:
+                case InternalFormat.Rgba16ui:
                     return 8;
 
-                case RenderbufferInternalFormat.Rgba32i:
-                case RenderbufferInternalFormat.Rgba32ui:
+                case InternalFormat.Rgba32i:
+                case InternalFormat.Rgba32ui:
                     return 16;
 
                 // GL_DEPTH_COMPONENT
-                case RenderbufferInternalFormat.DepthComponent16:
+                case InternalFormat.DepthComponent16:
                     return 2;
 
-                case RenderbufferInternalFormat.DepthComponent24:
+                case InternalFormat.DepthComponent24:
                     return 3;
 
-                case RenderbufferInternalFormat.DepthComponent32f:
+                case InternalFormat.DepthComponent32f:
                     return 4;
 
                 // GL_DEPTH_STENCIL
-                case RenderbufferInternalFormat.Depth24Stencil8:
+                case InternalFormat.Depth24Stencil8:
                     return 4;
 
-                case RenderbufferInternalFormat.Depth32fStencil8:
+                case InternalFormat.Depth32fStencil8:
                     return 5;
 
-                case RenderbufferInternalFormat.StencilIndex8:
+                case InternalFormat.StencilIndex8:
                     return 1;
 
                 default:
-                    throw new InvalidOperationException($"{format} is not a valid {nameof(RenderbufferInternalFormat)} type.");
+                    throw new InvalidOperationException($"{format} is not a valid {nameof(InternalFormat)} type.");
             }
         }
     }

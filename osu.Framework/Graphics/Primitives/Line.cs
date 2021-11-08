@@ -2,9 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Numerics;
 using System.Runtime.CompilerServices;
+using osu.Framework.Extensions;
 using osu.Framework.Utils;
-using osuTK;
+using Silk.NET.Maths;
 
 namespace osu.Framework.Graphics.Primitives
 {
@@ -26,7 +28,7 @@ namespace osu.Framework.Graphics.Primitives
         /// <summary>
         /// The length of the line.
         /// </summary>
-        public float Rho => (EndPoint - StartPoint).Length;
+        public float Rho => (EndPoint - StartPoint).Length();
 
         /// <summary>
         /// The direction of the second point from the first.
@@ -158,12 +160,12 @@ namespace osu.Framework.Graphics.Primitives
             return pB;
         }
 
-        public Matrix4 WorldMatrix() => Matrix4.CreateRotationZ(Theta) * Matrix4.CreateTranslation(StartPoint.X, StartPoint.Y, 0);
+        public Matrix4X4<float> WorldMatrix() => Matrix4X4.CreateRotationZ(Theta) * Matrix4X4.CreateTranslation(StartPoint.X, StartPoint.Y, 0);
 
         /// <summary>
         /// It's the end of the world as we know it
         /// </summary>
-        public Matrix4 EndWorldMatrix() => Matrix4.CreateRotationZ(Theta) * Matrix4.CreateTranslation(EndPoint.X, EndPoint.Y, 0);
+        public Matrix4X4<float> EndWorldMatrix() => Matrix4X4.CreateRotationZ(Theta) * Matrix4X4.CreateTranslation(EndPoint.X, EndPoint.Y, 0);
 
         public override string ToString() => $"{StartPoint} -> {EndPoint}";
     }

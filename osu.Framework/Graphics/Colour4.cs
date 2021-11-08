@@ -4,7 +4,6 @@
 using System;
 using System.Globalization;
 using System.Numerics;
-using osuTK.Graphics;
 
 namespace osu.Framework.Graphics
 {
@@ -206,20 +205,6 @@ namespace osu.Framework.Graphics
         /// <param name="second">The right hand side of the equation.</param>
         public static bool operator !=(Colour4 first, Colour4 second) => !first.Equals(second);
 
-        /// <summary>
-        /// Converts an osuTK <see cref="Color4"/> to an osu!framework <see cref="Colour4"/>.
-        /// </summary>
-        /// <param name="colour">The osuTK <see cref="Color4"/> to convert.</param>
-        public static implicit operator Colour4(Color4 colour) =>
-            new Colour4(colour.R, colour.G, colour.B, colour.A);
-
-        /// <summary>
-        /// Converts an osu!framework <see cref="Colour4"/> to an osuTK <see cref="Color4"/>.
-        /// </summary>
-        /// <param name="colour">The osu!framework <see cref="Colour4"/> to convert.</param>
-        public static implicit operator Color4(Colour4 colour) =>
-            new Color4(colour.R, colour.G, colour.B, colour.A);
-
         #endregion
 
         #region Conversion
@@ -378,6 +363,8 @@ namespace osu.Framework.Graphics
             return $"#{r:X2}{g:X2}{b:X2}{a:X2}";
         }
 
+        public static Colour4 FromHSV(Vector4 vector4) => FromHSV(vector4.X, vector4.Y, vector4.Z, vector4.W);
+
         /// <summary>
         /// Converts an HSV colour to a <see cref="Colour4"/>. All components should be in the range 0-1.
         /// </summary>
@@ -447,6 +434,8 @@ namespace osu.Framework.Graphics
 
             return new Vector4(hue == 1f ? 0f : hue, saturation, max, A);
         }
+
+        public static Colour4 FromHSL(Vector4 vector4) => FromHSL(vector4.X, vector4.Y, vector4.Z, vector4.W);
 
         /// <summary>
         /// Converts an HSL colour to a <see cref="Colour4"/>. All components should be in the range 0-1.

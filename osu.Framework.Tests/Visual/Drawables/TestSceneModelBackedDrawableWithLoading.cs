@@ -1,6 +1,7 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Numerics;
 using System.Threading;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -8,8 +9,6 @@ using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
-using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Framework.Tests.Visual.Drawables
 {
@@ -73,7 +72,7 @@ namespace osu.Framework.Tests.Visual.Drawables
                 {
                     new Box
                     {
-                        Colour = new Color4(0.1f, 0.1f, 0.1f, 1),
+                        Colour = new Colour4(0.1f, 0.1f, 0.1f, 1),
                         RelativeSizeAxes = Axes.Both,
                         Depth = float.MaxValue
                     },
@@ -128,26 +127,26 @@ namespace osu.Framework.Tests.Visual.Drawables
 
             public readonly ManualResetEventSlim AllowLoad = new ManualResetEventSlim();
 
-            protected Color4 BackgroundColour
+            protected Colour4 BackgroundColour
             {
                 get
                 {
                     switch (id % 5)
                     {
                         default:
-                            return Color4.SkyBlue;
+                            return Colour4.SkyBlue;
 
                         case 1:
-                            return Color4.Tomato;
+                            return Colour4.Tomato;
 
                         case 2:
-                            return Color4.DarkGreen;
+                            return Colour4.DarkGreen;
 
                         case 3:
-                            return Color4.MediumPurple;
+                            return Colour4.MediumPurple;
 
                         case 4:
-                            return Color4.DarkOrchid;
+                            return Colour4.DarkOrchid;
                     }
                 }
             }

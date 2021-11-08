@@ -3,14 +3,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Testing;
-using osuTK;
-using osuTK.Input;
+using Silk.NET.Input;
 
 namespace osu.Framework.Tests.Visual.Input
 {
@@ -151,7 +151,7 @@ namespace osu.Framework.Tests.Visual.Input
                 };
             });
 
-            AddStep("press lctrl", () => InputManager.PressKey(Key.LControl));
+            AddStep("press lctrl", () => InputManager.PressKey(Key.ControlLeft));
             AddAssert("press received", () => pressedReceived);
 
             AddStep("reset variables", () =>
@@ -160,14 +160,14 @@ namespace osu.Framework.Tests.Visual.Input
                 releasedReceived = false;
             });
 
-            AddStep("press rctrl", () => InputManager.PressKey(Key.RControl));
+            AddStep("press rctrl", () => InputManager.PressKey(Key.ControlRight));
             AddAssert("press not received", () => !pressedReceived);
             AddAssert("release not received", () => !releasedReceived);
 
-            AddStep("release rctrl", () => InputManager.ReleaseKey(Key.RControl));
+            AddStep("release rctrl", () => InputManager.ReleaseKey(Key.ControlRight));
             AddAssert("release not received", () => !releasedReceived);
 
-            AddStep("release lctrl", () => InputManager.ReleaseKey(Key.LControl));
+            AddStep("release lctrl", () => InputManager.ReleaseKey(Key.ControlLeft));
             AddAssert("release received", () => releasedReceived);
         }
 

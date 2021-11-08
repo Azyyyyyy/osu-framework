@@ -2,10 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Collections;
+using System.Numerics;
 using NUnit.Framework;
 using osu.Framework.Extensions.MatrixExtensions;
 using osu.Framework.Graphics.Primitives;
-using osuTK;
+using Silk.NET.Maths;
 
 namespace osu.Framework.Tests.Primitives
 {
@@ -58,7 +59,7 @@ namespace osu.Framework.Tests.Primitives
 
             private static Quad shear(Quad quad, Vector2 amount)
             {
-                var matrix = Matrix3.Identity;
+                var matrix = Matrix3X3<float>.Identity;
                 MatrixExtensions.ShearFromLeft(ref matrix, Vector2.Divide(amount, quad.Size));
 
                 return quad * matrix;

@@ -4,7 +4,7 @@
 using osu.Framework.Input.StateChanges;
 using osu.Framework.Platform;
 using osu.Framework.Statistics;
-using TKKey = osuTK.Input.Key;
+using TKKey = Silk.NET.Input.Key;
 
 namespace osu.Framework.Input.Handlers.Keyboard
 {

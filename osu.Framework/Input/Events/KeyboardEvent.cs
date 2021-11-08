@@ -4,7 +4,7 @@
 using System.Collections.Generic;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Input.States;
-using osuTK.Input;
+using Silk.NET.Input;
 
 namespace osu.Framework.Input.Events
 {

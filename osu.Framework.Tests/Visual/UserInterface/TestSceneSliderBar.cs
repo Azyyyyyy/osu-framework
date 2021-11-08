@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Numerics;
 using NUnit.Framework;
 using osu.Framework.Bindables;
 using osu.Framework.Graphics;
@@ -10,9 +11,7 @@ using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Utils;
 using osu.Framework.Testing;
-using osuTK;
-using osuTK.Graphics;
-using osuTK.Input;
+using Silk.NET.Input;
 
 namespace osu.Framework.Tests.Visual.UserInterface
 {
@@ -52,8 +51,8 @@ namespace osu.Framework.Tests.Visual.UserInterface
                     sliderBar = new TestSliderBar
                     {
                         Size = new Vector2(200, 50),
-                        BackgroundColour = Color4.White,
-                        SelectionColour = Color4.Pink,
+                        BackgroundColour = Colour4.White,
+                        SelectionColour = Colour4.Pink,
                         KeyboardStep = 1,
                         Current = sliderBarValue
                     },
@@ -65,8 +64,8 @@ namespace osu.Framework.Tests.Visual.UserInterface
                     {
                         Size = new Vector2(200, 10),
                         RangePadding = 20,
-                        BackgroundColour = Color4.White,
-                        SelectionColour = Color4.Pink,
+                        BackgroundColour = Colour4.White,
+                        SelectionColour = Colour4.Pink,
                         KeyboardStep = 1,
                         Current = sliderBarValue
                     },
@@ -78,8 +77,8 @@ namespace osu.Framework.Tests.Visual.UserInterface
                     {
                         TransferValueOnCommit = true,
                         Size = new Vector2(200, 10),
-                        BackgroundColour = Color4.White,
-                        SelectionColour = Color4.Pink,
+                        BackgroundColour = Colour4.White,
+                        SelectionColour = Colour4.Pink,
                         KeyboardStep = 1,
                         Current = sliderBarValue
                     },
@@ -172,10 +171,10 @@ namespace osu.Framework.Tests.Visual.UserInterface
             checkValue(-6, disabled);
             AddStep("Click at 75% mark, holding shift", () =>
             {
-                InputManager.PressKey(Key.LShift);
+                InputManager.PressKey(Key.ShiftLeft);
                 InputManager.MoveMouseTo(sliderBar.ToScreenSpace(sliderBar.DrawSize * new Vector2(0.75f, 0.5f)));
                 InputManager.Click(MouseButton.Left);
-                InputManager.ReleaseKey(Key.LShift);
+                InputManager.ReleaseKey(Key.ShiftLeft);
             });
             checkValue(5, disabled);
         }

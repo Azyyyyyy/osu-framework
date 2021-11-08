@@ -4,14 +4,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using NUnit.Framework;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
-using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Framework.Tests.Visual.Drawables
 {
@@ -163,7 +162,7 @@ namespace osu.Framework.Tests.Visual.Drawables
 
                 Child = new SpriteText
                 {
-                    Colour = Color4.Yellow,
+                    Colour = Colour4.Yellow,
                     Text = @"loaded",
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,

@@ -7,6 +7,7 @@ using System.Drawing;
 using JetBrains.Annotations;
 using osu.Framework.Bindables;
 using osu.Framework.Configuration;
+using Silk.NET.Input;
 
 namespace osu.Framework.Platform
 {
@@ -62,7 +63,7 @@ namespace osu.Framework.Platform
         /// <summary>
         /// Controls the state of the OS cursor.
         /// </summary>
-        CursorState CursorState { get; set; }
+        CursorMode CursorState { get; set; }
 
         /// <summary>
         /// Controls the state of the window.

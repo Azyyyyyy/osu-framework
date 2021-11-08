@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Numerics;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -9,8 +10,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Graphics.Transforms;
 using osu.Framework.Testing;
-using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Framework.Tests.Visual.Drawables
 {
@@ -128,7 +127,7 @@ namespace osu.Framework.Tests.Visual.Drawables
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.Gray,
+                            Colour = Colour4.Gray,
                         },
                         new SpriteText
                         {

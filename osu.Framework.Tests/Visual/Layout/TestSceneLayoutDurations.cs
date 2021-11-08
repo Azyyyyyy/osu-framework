@@ -1,6 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Numerics;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -8,8 +9,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
 using osu.Framework.Timing;
-using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Framework.Tests.Visual.Layout
 {
@@ -40,12 +39,12 @@ namespace osu.Framework.Tests.Visual.Layout
                     {
                         new Box
                         {
-                            Colour = Color4.Red,
+                            Colour = Colour4.Red,
                             RelativeSizeAxes = Axes.Both
                         },
                         box1 = new Box
                         {
-                            Colour = Color4.Transparent,
+                            Colour = Colour4.Transparent,
                             Size = Vector2.Zero,
                         },
                     }
@@ -57,8 +56,8 @@ namespace osu.Framework.Tests.Visual.Layout
                     LayoutEasing = Easing.None,
                     Children = new Drawable[]
                     {
-                        new Box { Colour = Color4.Red, Size = new Vector2(100) },
-                        box2 = new Box { Colour = Color4.Blue, Size = new Vector2(100) },
+                        new Box { Colour = Colour4.Red, Size = new Vector2(100) },
+                        box2 = new Box { Colour = Colour4.Blue, Size = new Vector2(100) },
                     }
                 }
             };

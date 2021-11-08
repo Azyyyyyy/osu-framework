@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Numerics;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -14,9 +15,7 @@ using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Testing;
-using osuTK;
-using osuTK.Graphics;
-using osuTK.Input;
+using Silk.NET.Input;
 
 namespace osu.Framework.Tests.Visual.Input
 {
@@ -517,7 +516,7 @@ namespace osu.Framework.Tests.Visual.Input
                 Action = action;
                 Concurrency = concurrency;
 
-                BackgroundColour = Color4.SkyBlue;
+                BackgroundColour = Colour4.SkyBlue;
                 SpriteText.Font = SpriteText.Font.With(size: SpriteText.Font.Size * .8f);
                 actionText = action.ToString().Replace('_', ' ');
 

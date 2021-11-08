@@ -5,13 +5,14 @@ using osu.Framework.Allocation;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Numerics;
 using JetBrains.Annotations;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics.Animations;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Graphics.Shaders;
-using osuTK;
+using Silk.NET.Maths;
 
 namespace osu.Framework.Graphics.Video
 {
@@ -79,7 +80,7 @@ namespace osu.Framework.Graphics.Video
         /// <summary>
         /// YUV->RGB conversion matrix based on the video colorspace
         /// </summary>
-        public Matrix3 ConversionMatrix => decoder.GetConversionMatrix();
+        public Matrix3X3<float> ConversionMatrix => decoder.GetConversionMatrix();
 
         /// <summary>
         /// Creates a new <see cref="Video"/>.

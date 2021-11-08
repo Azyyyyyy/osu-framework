@@ -3,10 +3,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 using osu.Framework.Graphics.OpenGL;
 using osu.Framework.Threading;
-using osuTK;
-using osuTK.Graphics.ES30;
+using Silk.NET.Maths;
+using Silk.NET.OpenGL;
 using static osu.Framework.Threading.ScheduledDelegate;
 
 namespace osu.Framework.Graphics.Shaders
@@ -29,7 +30,7 @@ namespace osu.Framework.Graphics.Shaders
 
         internal bool IsBound { get; private set; }
 
-        private int programID = -1;
+        private uint programID = 0;
 
         internal Shader(string name, List<ShaderPart> parts)
         {
@@ -121,68 +122,68 @@ namespace osu.Framework.Graphics.Shaders
             foreach (ShaderPart p in parts)
             {
                 if (!p.Compiled) p.Compile();
-                GL.AttachShader(this, p);
+                GLWrapper.GL.AttachShader(this, p);
 
                 foreach (ShaderInputInfo input in p.ShaderInputs)
-                    GL.BindAttribLocation(this, input.Location, input.Name);
+                    GLWrapper.GL.BindAttribLocation(this, (uint)input.Location, input.Name);
             }
 
-            GL.LinkProgram(this);
-            GL.GetProgram(this, GetProgramParameterName.LinkStatus, out int linkResult);
+            GLWrapper.GL.LinkProgram(this);
+            GLWrapper.GL.GetProgram(this, GLEnum.LinkStatus, out int linkResult);
 
             foreach (var part in parts)
-                GL.DetachShader(this, part);
+                GLWrapper.GL.DetachShader(this, part);
 
             return linkResult == 1;
         }
 
         private protected virtual void SetupUniforms()
         {
-            GL.GetProgram(this, GetProgramParameterName.ActiveUniforms, out int uniformCount);
+            GLWrapper.GL.GetProgram(this, GLEnum.ActiveUniforms, out int uniformCount);
 
             uniformsValues = new IUniform[uniformCount];
 
             for (int i = 0; i < uniformCount; i++)
             {
-                GL.GetActiveUniform(this, i, 100, out _, out _, out ActiveUniformType type, out string uniformName);
+                GLWrapper.GL.GetActiveUniform(this, (uint)i, 100, out _, out _, out UniformType type, out string uniformName);
 
                 IUniform uniform;
 
                 switch (type)
                 {
-                    case ActiveUniformType.Bool:
+                    case UniformType.Bool:
                         uniform = createUniform<bool>(uniformName);
                         break;
 
-                    case ActiveUniformType.Float:
+                    case UniformType.Float:
                         uniform = createUniform<float>(uniformName);
                         break;
 
-                    case ActiveUniformType.Int:
+                    case UniformType.Int:
                         uniform = createUniform<int>(uniformName);
                         break;
 
-                    case ActiveUniformType.FloatMat3:
-                        uniform = createUniform<Matrix3>(uniformName);
+                    case UniformType.FloatMat3:
+                        uniform = createUniform<Matrix3X3<float>>(uniformName);
                         break;
 
-                    case ActiveUniformType.FloatMat4:
-                        uniform = createUniform<Matrix4>(uniformName);
+                    case UniformType.FloatMat4:
+                        uniform = createUniform<Matrix4X4<float>>(uniformName);
                         break;
 
-                    case ActiveUniformType.FloatVec2:
+                    case UniformType.FloatVec2:
                         uniform = createUniform<Vector2>(uniformName);
                         break;
 
-                    case ActiveUniformType.FloatVec3:
+                    case UniformType.FloatVec3:
                         uniform = createUniform<Vector3>(uniformName);
                         break;
 
-                    case ActiveUniformType.FloatVec4:
+                    case UniformType.FloatVec4:
                         uniform = createUniform<Vector4>(uniformName);
                         break;
 
-                    case ActiveUniformType.Sampler2D:
+                    case UniformType.Sampler2D:
                         uniform = createUniform<int>(uniformName);
                         break;
 
@@ -197,7 +198,7 @@ namespace osu.Framework.Graphics.Shaders
             IUniform createUniform<T>(string name)
                 where T : struct, IEquatable<T>
             {
-                int location = GL.GetUniformLocation(this, name);
+                int location = GLWrapper.GL.GetUniformLocation(this, name);
 
                 if (GlobalPropertyManager.CheckGlobalExists(name)) return new GlobalUniform<T>(this, name, location);
 
@@ -205,15 +206,15 @@ namespace osu.Framework.Graphics.Shaders
             }
         }
 
-        private protected virtual string GetProgramLog() => GL.GetProgramInfoLog(this);
+        private protected virtual string GetProgramLog() => GLWrapper.GL.GetProgramInfoLog(this);
 
-        private protected virtual int CreateProgram() => GL.CreateProgram();
+        private protected virtual uint CreateProgram() => GLWrapper.GL.CreateProgram();
 
-        private protected virtual void DeleteProgram(int id) => GL.DeleteProgram(id);
+        private protected virtual void DeleteProgram(uint id) => GLWrapper.GL.DeleteProgram(id);
 
-        public override string ToString() => $@"{name} Shader (Compiled: {programID != -1})";
+        public override string ToString() => $@"{name} Shader (Compiled: {programID != 0})";
 
-        public static implicit operator int(Shader shader) => shader.programID;
+        public static implicit operator uint(Shader shader) => shader.programID;
 
         #region IDisposable Support
 
@@ -240,7 +241,7 @@ namespace osu.Framework.Graphics.Shaders
 
                 GlobalPropertyManager.Unregister(this);
 
-                if (programID != -1)
+                if (programID != 0)
                     DeleteProgram(this);
             }
         }

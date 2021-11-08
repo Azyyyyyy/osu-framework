@@ -5,19 +5,18 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Numerics;
 using osu.Framework.Caching;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
-using osuTK;
-using osuTK.Graphics;
-using osuTK.Input;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Platform;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Localisation;
+using Silk.NET.Input;
 
 namespace osu.Framework.Graphics.UserInterface
 {
@@ -823,7 +822,7 @@ namespace osu.Framework.Graphics.UserInterface
                     return true;
 
                 // avoid blocking certain keys which may be used during typing but don't produce characters.
-                case Key.BackSpace:
+                case Key.Backspace:
                 case Key.Delete:
                     return false;
             }
@@ -831,7 +830,7 @@ namespace osu.Framework.Graphics.UserInterface
             return base.OnKeyDown(e) || consumingText;
         }
 
-        private bool keyProducesCharacter(Key key) => (key == Key.Space || key >= Key.Keypad0 && key <= Key.NonUSBackSlash) && key != Key.KeypadEnter;
+        private bool keyProducesCharacter(Key key) => (key == Key.Space || key >= Key.Keypad0 && key <= Key.BackSlash) && key != Key.KeypadEnter;
 
         /// <summary>
         /// Removes focus from this <see cref="TextBox"/> if it currently has focus.
@@ -1035,7 +1034,7 @@ namespace osu.Framework.Graphics.UserInterface
             {
                 foreach (var d in imeDrawables)
                 {
-                    d.Colour = Color4.White;
+                    d.Colour = Colour4.White;
                     d.FadeTo(1, 200, Easing.Out);
                 }
             }
@@ -1080,7 +1079,7 @@ namespace osu.Framework.Graphics.UserInterface
 
             insertString(insertedText, d =>
             {
-                d.Colour = Color4.Aqua;
+                d.Colour = Colour4.Aqua;
                 d.Alpha = 0.6f;
                 imeDrawables.Add(d);
             });

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using osu.Framework.Graphics.OpenGL;
-using osuTK.Graphics.ES30;
+using Silk.NET.OpenGL;
 
 namespace osu.Framework.Graphics.Shaders
 {
@@ -24,7 +24,7 @@ namespace osu.Framework.Graphics.Shaders
 
         private bool isVertexShader => Type == ShaderType.VertexShader || Type == ShaderType.VertexShaderArb;
 
-        private int partID = -1;
+        private uint partID = 0;
 
         private int lastShaderInputIndex;
 
@@ -124,31 +124,31 @@ namespace osu.Framework.Graphics.Shaders
             }
         }
 
-        internal bool Compile()
+        internal unsafe bool Compile()
         {
             if (!HasCode)
                 return false;
 
-            if (partID == -1)
-                partID = GL.CreateShader(Type);
+            if (partID == 0)
+                partID = GLWrapper.GL.CreateShader(Type);
 
             int[] codeLengths = new int[shaderCodes.Count];
             for (int i = 0; i < shaderCodes.Count; i++)
                 codeLengths[i] = shaderCodes[i].Length;
 
-            GL.ShaderSource(this, shaderCodes.Count, shaderCodes.ToArray(), codeLengths);
-            GL.CompileShader(this);
+            GLWrapper.GL.ShaderSource(this, (uint)shaderCodes.Count, shaderCodes.ToArray(), codeLengths.AsSpan().GetPinnableReference());
+            GLWrapper.GL.CompileShader(this);
 
-            GL.GetShader(this, ShaderParameter.CompileStatus, out int compileResult);
+            GLWrapper.GL.GetShader(this, GLEnum.CompileStatus, out int compileResult);
             Compiled = compileResult == 1;
 
             if (!Compiled)
-                throw new Shader.PartCompilationFailedException(Name, GL.GetShaderInfoLog(this));
+                throw new Shader.PartCompilationFailedException(Name, GLWrapper.GL.GetShaderInfoLog(this));
 
             return Compiled;
         }
 
-        public static implicit operator int(ShaderPart program) => program.partID;
+        public static implicit operator uint(ShaderPart program) => program.partID;
 
         #region IDisposable Support
 
@@ -171,8 +171,8 @@ namespace osu.Framework.Graphics.Shaders
             {
                 IsDisposed = true;
 
-                if (partID != -1)
-                    GL.DeleteShader(this);
+                if (partID != 0)
+                    GLWrapper.GL.DeleteShader(this);
             }
         }
 

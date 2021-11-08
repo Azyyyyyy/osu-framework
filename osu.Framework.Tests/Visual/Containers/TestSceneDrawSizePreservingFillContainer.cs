@@ -1,13 +1,12 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Numerics;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Utils;
-using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Framework.Tests.Visual.Containers
 {
@@ -27,7 +26,7 @@ namespace osu.Framework.Tests.Visual.Containers
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Red,
+                        Colour = Colour4.Red,
                     },
                     new Container
                     {
@@ -38,7 +37,7 @@ namespace osu.Framework.Tests.Visual.Containers
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = Color4.Black,
+                                Colour = Colour4.Black,
                             },
                             fillContainer = new DrawSizePreservingFillContainer
                             {
@@ -78,7 +77,7 @@ namespace osu.Framework.Tests.Visual.Containers
                         fullBox = new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.Red,
+                            Colour = Colour4.Red,
                         },
                         new Container
                         {
@@ -91,7 +90,7 @@ namespace osu.Framework.Tests.Visual.Containers
                                     Child = innerBox = new Box
                                     {
                                         Size = new Vector2(1024, 768),
-                                        Colour = Color4.Pink,
+                                        Colour = Colour4.Pink,
                                         Alpha = 0.3f
                                     }
                                 },

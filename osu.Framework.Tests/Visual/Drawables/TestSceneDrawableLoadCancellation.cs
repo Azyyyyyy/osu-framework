@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Threading;
 using System.Threading.Tasks;
 using NUnit.Framework;
@@ -13,8 +14,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Logging;
-using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Framework.Tests.Visual.Drawables
 {
@@ -96,7 +95,7 @@ namespace osu.Framework.Tests.Visual.Drawables
                 {
                     new Box
                     {
-                        Colour = Color4.Navy,
+                        Colour = Colour4.Navy,
                         RelativeSizeAxes = Axes.Both,
                     },
                 };
@@ -132,13 +131,13 @@ namespace osu.Framework.Tests.Visual.Drawables
                 {
                     new Box
                     {
-                        Colour = Color4.NavajoWhite,
+                        Colour = Colour4.NavajoWhite,
                         RelativeSizeAxes = Axes.Both
                     },
                     new SpriteText
                     {
                         Text = id.ToString(),
-                        Colour = Color4.Black,
+                        Colour = Colour4.Black,
                         Font = new FontUsage(size: 50),
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre

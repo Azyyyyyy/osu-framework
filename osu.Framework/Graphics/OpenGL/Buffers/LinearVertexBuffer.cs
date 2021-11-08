@@ -3,7 +3,7 @@
 
 using System;
 using osu.Framework.Graphics.OpenGL.Vertices;
-using osuTK.Graphics.ES30;
+using Silk.NET.OpenGL;
 
 namespace osu.Framework.Graphics.OpenGL.Buffers
 {
@@ -11,10 +11,10 @@ namespace osu.Framework.Graphics.OpenGL.Buffers
     {
         static LinearIndexData()
         {
-            GL.GenBuffers(1, out EBO_ID);
+            GLWrapper.GL.GenBuffers(1, out EBO_ID);
         }
 
-        public static readonly int EBO_ID;
+        public static readonly uint EBO_ID;
         public static int MaxAmountIndices;
     }
 
@@ -26,26 +26,26 @@ namespace osu.Framework.Graphics.OpenGL.Buffers
     {
         private readonly int amountVertices;
 
-        internal LinearVertexBuffer(int amountVertices, PrimitiveType type, BufferUsageHint usage)
+        internal LinearVertexBuffer(int amountVertices, PrimitiveType type, BufferUsageARB usage)
             : base(amountVertices, usage)
         {
             this.amountVertices = amountVertices;
             Type = type;
         }
 
-        protected override void Initialise()
+        protected override unsafe void Initialise()
         {
             base.Initialise();
 
             if (amountVertices > LinearIndexData.MaxAmountIndices)
             {
-                ushort[] indices = new ushort[amountVertices];
+                short[] indices = new short[amountVertices];
 
-                for (ushort i = 0; i < amountVertices; i++)
+                for (short i = 0; i < amountVertices; i++)
                     indices[i] = i;
 
-                GLWrapper.BindBuffer(BufferTarget.ElementArrayBuffer, LinearIndexData.EBO_ID);
-                GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(amountVertices * sizeof(ushort)), indices, BufferUsageHint.StaticDraw);
+                GLWrapper.BindBuffer(BufferTargetARB.ElementArrayBuffer, LinearIndexData.EBO_ID);
+                GLWrapper.GL.BufferData(BufferTargetARB.ElementArrayBuffer, (uint)(amountVertices * sizeof(short)), indices.AsSpan().GetPinnableReference(), BufferUsageARB.StaticDraw);
 
                 LinearIndexData.MaxAmountIndices = amountVertices;
             }
@@ -56,7 +56,7 @@ namespace osu.Framework.Graphics.OpenGL.Buffers
             base.Bind(forRendering);
 
             if (forRendering)
-                GLWrapper.BindBuffer(BufferTarget.ElementArrayBuffer, LinearIndexData.EBO_ID);
+                GLWrapper.BindBuffer(BufferTargetARB.ElementArrayBuffer, LinearIndexData.EBO_ID);
         }
 
         protected override PrimitiveType Type { get; }

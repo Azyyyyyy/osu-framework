@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 #if NET5_0
+using System.Numerics;
 using OpenTabletDriver.Plugin;
 using OpenTabletDriver.Plugin.Output;
 using OpenTabletDriver.Plugin.Platform.Pointer;
@@ -10,7 +11,6 @@ using osu.Framework.Bindables;
 using osu.Framework.Input.StateChanges;
 using osu.Framework.Platform;
 using osu.Framework.Statistics;
-using osuTK;
 
 namespace osu.Framework.Input.Handlers.Tablet
 {
@@ -78,7 +78,7 @@ namespace osu.Framework.Input.Handlers.Tablet
 
         void IAbsolutePointer.SetPosition(System.Numerics.Vector2 pos) => enqueueInput(new MousePositionAbsoluteInput { Position = new Vector2(pos.X, pos.Y) });
 
-        void IVirtualTablet.SetPressure(float percentage) => enqueueInput(new MouseButtonInput(osuTK.Input.MouseButton.Left, percentage > 0));
+        void IVirtualTablet.SetPressure(float percentage) => enqueueInput(new MouseButtonInput(Silk.NET.Input.MouseButton.Left, percentage > 0));
 
         void IRelativePointer.Translate(System.Numerics.Vector2 delta) => enqueueInput(new MousePositionRelativeInput { Delta = new Vector2(delta.X, delta.Y) });
 

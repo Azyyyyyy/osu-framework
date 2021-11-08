@@ -2,7 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Graphics.OpenGL.Textures;
-using osuTK.Graphics.ES30;
+using Silk.NET.OpenGL;
 
 namespace osu.Framework.Graphics.Textures
 {
@@ -16,7 +16,7 @@ namespace osu.Framework.Graphics.Textures
         {
         }
 
-        public DisposableTexture(int width, int height, bool manualMipmaps = false, All filteringMode = All.Linear)
+        public DisposableTexture(int width, int height, bool manualMipmaps = false, GLEnum filteringMode = GLEnum.Linear)
             : base(width, height, manualMipmaps, filteringMode)
         {
         }

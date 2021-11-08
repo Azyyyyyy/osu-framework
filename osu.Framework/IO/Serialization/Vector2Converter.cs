@@ -2,9 +2,9 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Numerics;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using osuTK;
 
 namespace osu.Framework.IO.Serialization
 {

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using osu.Framework.Input.Events;
 using osu.Framework.Platform;
 
 namespace osu.Framework.Input
@@ -17,7 +18,7 @@ namespace osu.Framework.Input
             this.window = window;
         }
 
-        protected virtual void HandleKeyPress(object sender, osuTK.KeyPressEventArgs e) => pending += e.KeyChar;
+        protected virtual void HandleKeyPress(object sender, KeyDownEvent e) => pending += e.Key;
 
         protected virtual void HandleKeyTyped(char c) => pending += c;
 
@@ -42,10 +43,6 @@ namespace osu.Framework.Input
                 case SDL2DesktopWindow win:
                     win.KeyTyped -= HandleKeyTyped;
                     break;
-
-                case OsuTKWindow tkWin:
-                    tkWin.KeyPress -= HandleKeyPress;
-                    break;
             }
         }
 
@@ -55,10 +52,6 @@ namespace osu.Framework.Input
             {
                 case SDL2DesktopWindow win:
                     win.KeyTyped += HandleKeyTyped;
-                    break;
-
-                case OsuTKWindow tkWin:
-                    tkWin.KeyPress += HandleKeyPress;
                     break;
             }
         }

@@ -6,6 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Numerics;
 using System.Reflection;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
@@ -31,9 +32,7 @@ using osu.Framework.Platform;
 using osu.Framework.Testing.Drawables;
 using osu.Framework.Testing.Drawables.Steps;
 using osu.Framework.Timing;
-using osuTK;
-using osuTK.Graphics;
-using osuTK.Input;
+using Silk.NET.Input;
 using Logger = osu.Framework.Logging.Logger;
 
 namespace osu.Framework.Testing
@@ -170,7 +169,7 @@ namespace osu.Framework.Testing
                                         new Box
                                         {
                                             RelativeSizeAxes = Axes.Both,
-                                            Colour = Color4.Black,
+                                            Colour = Colour4.Black,
                                         },
                                         new SpriteText
                                         {
@@ -285,7 +284,7 @@ namespace osu.Framework.Testing
         private void compileStarted() => Schedule(() =>
         {
             compilingNotice.Show();
-            compilingNotice.FadeColour(Color4.White);
+            compilingNotice.FadeColour(Colour4.White);
         });
 
         private void compileFailed(Exception ex) => Schedule(() =>
@@ -293,13 +292,13 @@ namespace osu.Framework.Testing
             Logger.Error(ex, "Error with dynamic compilation!");
 
             compilingNotice.FadeIn(100, Easing.OutQuint).Then().FadeOut(800, Easing.InQuint);
-            compilingNotice.FadeColour(Color4.Red, 100);
+            compilingNotice.FadeColour(Colour4.Red, 100);
         });
 
         private void compileFinished(Type newType) => Schedule(() =>
         {
             compilingNotice.FadeOut(800, Easing.InQuint);
-            compilingNotice.FadeColour(Color4.YellowGreen, 100);
+            compilingNotice.FadeColour(Colour4.YellowGreen, 100);
 
             if (newType == null)
                 return;
@@ -597,7 +596,7 @@ namespace osu.Framework.Testing
                     CurrentTest.AddStep(new SingleStepButton(true)
                     {
                         Text = "[SetUp]",
-                        LightColour = Color4.Teal,
+                        LightColour = Colour4.Teal,
                         Action = () => setUpMethods.ForEach(s => s.Invoke(CurrentTest, null))
                     });
                 }

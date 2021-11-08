@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using osuTK.Graphics.ES30;
 
 namespace osu.Framework.Graphics.OpenGL.Vertices
 {
@@ -24,7 +23,7 @@ namespace osu.Framework.Graphics.OpenGL.Vertices
         public static readonly int STRIDE = Marshal.SizeOf(default(T));
 
         private static readonly List<VertexMemberAttribute> attributes = new List<VertexMemberAttribute>();
-        private static int amountEnabledAttributes;
+        private static uint amountEnabledAttributes;
 
         static VertexUtils()
         {
@@ -59,27 +58,30 @@ namespace osu.Framework.Graphics.OpenGL.Vertices
         /// <summary>
         /// Enables and binds the vertex attributes/pointers for the vertex of type <typeparamref name="T"/>.
         /// </summary>
-        public static void Bind()
+        public static unsafe void Bind()
         {
-            enableAttributes(attributes.Count);
+            enableAttributes((uint)attributes.Count);
+
             for (int i = 0; i < attributes.Count; i++)
-                GL.VertexAttribPointer(i, attributes[i].Count, attributes[i].Type, attributes[i].Normalized, STRIDE, attributes[i].Offset);
+            {
+                GLWrapper.GL.VertexAttribPointer((uint)i, attributes[i].Count, attributes[i].Type, attributes[i].Normalized, (uint)STRIDE, attributes[i].Offset.ToPointer());
+            }
         }
 
-        private static void enableAttributes(int amount)
+        private static void enableAttributes(uint amount)
         {
             if (amount == amountEnabledAttributes)
                 return;
 
             if (amount > amountEnabledAttributes)
             {
-                for (int i = amountEnabledAttributes; i < amount; ++i)
-                    GL.EnableVertexAttribArray(i);
+                for (uint i = amountEnabledAttributes; i < amount; ++i)
+                    GLWrapper.GL.EnableVertexAttribArray(i);
             }
             else
             {
-                for (int i = amountEnabledAttributes - 1; i >= amount; --i)
-                    GL.DisableVertexAttribArray(i);
+                for (uint i = amountEnabledAttributes - 1; i >= amount; --i)
+                    GLWrapper.GL.DisableVertexAttribArray(i);
             }
 
             amountEnabledAttributes = amount;

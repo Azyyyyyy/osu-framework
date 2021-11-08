@@ -3,9 +3,9 @@
 
 using System;
 using osu.Framework.Graphics.Textures;
-using osuTK.Graphics.ES30;
 using FFmpeg.AutoGen;
 using osu.Framework.Graphics.Primitives;
+using Silk.NET.OpenGL;
 using SixLabors.ImageSharp.PixelFormats;
 
 namespace osu.Framework.Graphics.Video

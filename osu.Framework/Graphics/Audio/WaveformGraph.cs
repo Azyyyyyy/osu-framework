@@ -4,21 +4,21 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Threading;
 using osu.Framework.Allocation;
 using osu.Framework.Audio.Track;
+using osu.Framework.Extensions.MatrixExtensions;
 using osu.Framework.Graphics.Batches;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.Textures;
-using osuTK;
 using osu.Framework.Graphics.OpenGL;
 using osu.Framework.Layout;
 using osu.Framework.Utils;
 using osu.Framework.Threading;
-using osuTK.Graphics;
 using RectangleF = osu.Framework.Graphics.Primitives.RectangleF;
 
 namespace osu.Framework.Graphics.Audio
@@ -81,13 +81,13 @@ namespace osu.Framework.Graphics.Audio
             }
         }
 
-        private Color4 baseColour = Color4.White;
+        private Colour4 baseColour = Colour4.White;
 
         /// <summary>
         /// The base colour of the graph for frequencies that don't fall into the predefined low/mid/high buckets.
         /// Also serves as the default value of <see cref="LowColour"/>, <see cref="MidColour"/>, and <see cref="HighColour"/>.
         /// </summary>
-        public Color4 BaseColour
+        public Colour4 BaseColour
         {
             get => baseColour;
             set
@@ -101,13 +101,13 @@ namespace osu.Framework.Graphics.Audio
             }
         }
 
-        private Color4? lowColour;
+        private Colour4? lowColour;
 
         /// <summary>
         /// The colour which low-range frequencies should be colourised with.
         /// May be null for this frequency range to not be colourised.
         /// </summary>
-        public Color4? LowColour
+        public Colour4? LowColour
         {
             get => lowColour;
             set
@@ -121,13 +121,13 @@ namespace osu.Framework.Graphics.Audio
             }
         }
 
-        private Color4? midColour;
+        private Colour4? midColour;
 
         /// <summary>
         /// The colour which mid-range frequencies should be colourised with.
         /// May be null for this frequency range to not be colourised.
         /// </summary>
-        public Color4? MidColour
+        public Colour4? MidColour
         {
             get => midColour;
             set
@@ -141,13 +141,13 @@ namespace osu.Framework.Graphics.Audio
             }
         }
 
-        private Color4? highColour;
+        private Colour4? highColour;
 
         /// <summary>
         /// The colour which high-range frequencies should be colourised with.
         /// May be null for this frequency range to not be colourised.
         /// </summary>
-        public Color4? HighColour
+        public Colour4? HighColour
         {
             get => highColour;
             set
@@ -253,10 +253,10 @@ namespace osu.Framework.Graphics.Audio
             private Vector2 drawSize;
             private int channels;
 
-            private Color4 baseColour;
-            private Color4 lowColour;
-            private Color4 midColour;
-            private Color4 highColour;
+            private Colour4 baseColour;
+            private Colour4 lowColour;
+            private Colour4 midColour;
+            private Colour4 highColour;
 
             private double highMax;
             private double midMax;
@@ -305,7 +305,7 @@ namespace osu.Framework.Graphics.Audio
                 shader.Bind();
                 texture.TextureGL.Bind();
 
-                Vector2 localInflationAmount = new Vector2(0, 1) * DrawInfo.MatrixInverse.ExtractScale().Xy;
+                Vector2 localInflationAmount = new Vector2(0, 1) * DrawInfo.MatrixInverse.XY();
 
                 // We're dealing with a _large_ number of points, so we need to optimise the quadToDraw * drawInfo.Matrix multiplications below
                 // for points that are going to be masked out anyway. This allows for higher resolution graphs at larger scales with virtually no performance loss.
@@ -325,7 +325,7 @@ namespace osu.Framework.Graphics.Audio
                     if (leftX > localMaskingRectangle.Right)
                         break; // X is always increasing
 
-                    Color4 frequencyColour = baseColour;
+                    Colour4 frequencyColour = baseColour;
 
                     // colouring is applied in the order of interest to a viewer.
                     frequencyColour = Interpolation.ValueAt(points[i].MidIntensity / midMax, frequencyColour, midColour, 0, 1);

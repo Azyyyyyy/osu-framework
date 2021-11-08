@@ -69,7 +69,7 @@ namespace osu.Framework.Tests.Shaders
                 {
                 }
 
-                private protected override int CreateProgram() => 1337;
+                private protected override uint CreateProgram() => 1337;
 
                 private protected override bool CompileInternal() => true;
 
@@ -80,7 +80,7 @@ namespace osu.Framework.Tests.Shaders
 
                 private protected override string GetProgramLog() => string.Empty;
 
-                private protected override void DeleteProgram(int id)
+                private protected override void DeleteProgram(uint id)
                 {
                 }
             }

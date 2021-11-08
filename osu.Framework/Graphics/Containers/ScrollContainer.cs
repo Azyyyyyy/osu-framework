@@ -3,13 +3,14 @@
 
 using System;
 using System.Diagnostics;
+using System.Numerics;
 using osu.Framework.Caching;
+using osu.Framework.Extensions;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
-using osuTK;
-using osuTK.Input;
+using Silk.NET.Input;
 
 namespace osu.Framework.Graphics.Containers
 {
@@ -65,12 +66,12 @@ namespace osu.Framework.Graphics.Containers
         /// <summary>
         /// Size of available content (i.e. everything that can be scrolled to) in the scroll direction.
         /// </summary>
-        public float AvailableContent => ScrollContent.DrawSize[ScrollDim];
+        public float AvailableContent => ScrollContent.DrawSize.GetIndex(ScrollDim);
 
         /// <summary>
         /// Size of the viewport in the scroll direction.
         /// </summary>
-        public float DisplayableContent => ChildSize[ScrollDim];
+        public float DisplayableContent => ChildSize.GetIndex(ScrollDim);
 
         /// <summary>
         /// Controls the distance scrolled per unit of mouse scroll.
@@ -128,7 +129,7 @@ namespace osu.Framework.Graphics.Containers
         /// <summary>
         /// The maximum distance that the scrollbar can move in the scroll direction.
         /// </summary>
-        public float ScrollbarMovementExtent => Math.Max(DrawSize[ScrollDim] - Scrollbar.DrawSize[ScrollDim], 0);
+        public float ScrollbarMovementExtent => Math.Max(DrawSize.GetIndex(ScrollDim) - Scrollbar.DrawSize.GetIndex(ScrollDim), 0);
 
         /// <summary>
         /// Clamp a value to the available scroll range.
@@ -309,13 +310,13 @@ namespace osu.Framework.Graphics.Containers
             double decay = Math.Pow(0.95, timeDelta);
 
             averageDragTime = averageDragTime * decay + timeDelta;
-            averageDragDelta = averageDragDelta * decay - e.Delta[ScrollDim];
+            averageDragDelta = averageDragDelta * decay - e.Delta.GetIndex(ScrollDim);
 
             lastDragTime = currentTime;
 
             Vector2 childDelta = ToLocalSpace(e.ScreenSpaceMousePosition) - ToLocalSpace(e.ScreenSpaceLastMousePosition);
 
-            float scrollOffset = -childDelta[ScrollDim];
+            float scrollOffset = -childDelta.GetIndex(ScrollDim);
             float clampedScrollOffset = Clamp(Target + scrollOffset) - Clamp(Target);
 
             Debug.Assert(Precision.AlmostBigger(Math.Abs(scrollOffset), clampedScrollOffset * Math.Sign(scrollOffset)));
@@ -327,7 +328,7 @@ namespace osu.Framework.Graphics.Containers
             // similar calculation to what is already done in MouseButtonEventManager.HandlePositionChange
             // handles the case where a drag was triggered on an axis we are not interested in.
             // can be removed if/when drag events are split out per axis or contain direction information.
-            dragBlocksClick |= Math.Abs(e.MouseDownPosition[ScrollDim] - e.MousePosition[ScrollDim]) > dragButtonManager.ClickDragDistance;
+            dragBlocksClick |= Math.Abs(e.MouseDownPosition.GetIndex(ScrollDim) - e.MousePosition.GetIndex(ScrollDim)) > dragButtonManager.ClickDragDistance;
 
             scrollByOffset(scrollOffset, false);
         }
@@ -465,7 +466,7 @@ namespace osu.Framework.Graphics.Containers
             float minPos = Math.Min(childPos0, childPos1);
             float maxPos = Math.Max(childPos0, childPos1);
 
-            if (minPos < Current || (minPos > Current && d.DrawSize[ScrollDim] > DisplayableContent))
+            if (minPos < Current || (minPos > Current && d.DrawSize.GetIndex(ScrollDim) > DisplayableContent))
                 ScrollTo(minPos, animated);
             else if (maxPos > Current + DisplayableContent)
                 ScrollTo(maxPos - DisplayableContent, animated);
@@ -477,7 +478,7 @@ namespace osu.Framework.Graphics.Containers
         /// <param name="d">The child to get the position from.</param>
         /// <param name="offset">Positional offset in the child's space.</param>
         /// <returns>The position of the child.</returns>
-        public float GetChildPosInContent(Drawable d, Vector2 offset) => d.ToSpaceOfOtherDrawable(offset, ScrollContent)[ScrollDim];
+        public float GetChildPosInContent(Drawable d, Vector2 offset) => d.ToSpaceOfOtherDrawable(offset, ScrollContent).GetIndex(ScrollDim);
 
         /// <summary>
         /// Determines the position of a child in the content.
@@ -594,7 +595,7 @@ namespace osu.Framework.Graphics.Containers
             /// <summary>
             /// The minimum size of this <see cref="ScrollbarContainer"/>. Defaults to the size in the non-scrolling direction.
             /// </summary>
-            protected internal virtual float MinimumDimSize => Size[ScrollDirection == Direction.Vertical ? 0 : 1];
+            protected internal virtual float MinimumDimSize => Size.GetIndex(ScrollDirection == Direction.Vertical ? 0 : 1);
 
             protected ScrollbarContainer(Direction direction)
             {
@@ -611,7 +612,7 @@ namespace osu.Framework.Graphics.Containers
             {
                 if (e.Button != MouseButton.Left) return false;
 
-                dragOffset = e.MousePosition[(int)ScrollDirection] - Position[(int)ScrollDirection];
+                dragOffset = e.MousePosition.GetIndex((int)ScrollDirection) - Position.GetIndex((int)ScrollDirection);
                 return true;
             }
 
@@ -619,14 +620,14 @@ namespace osu.Framework.Graphics.Containers
             {
                 if (e.Button != MouseButton.Left) return false;
 
-                dragOffset = Position[(int)ScrollDirection];
+                dragOffset = Position.GetIndex((int)ScrollDirection);
                 Dragged?.Invoke(dragOffset);
                 return true;
             }
 
             protected override void OnDrag(DragEvent e)
             {
-                Dragged?.Invoke(e.MousePosition[(int)ScrollDirection] - dragOffset);
+                Dragged?.Invoke(e.MousePosition.GetIndex((int)ScrollDirection) - dragOffset);
             }
         }
 

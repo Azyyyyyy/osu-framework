@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using System.Numerics;
 using ManagedBass;
 using ManagedBass.Fx;
 using NUnit.Framework;
@@ -14,8 +15,6 @@ using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
-using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Framework.Tests.Visual.Audio
 {
@@ -27,7 +26,7 @@ namespace osu.Framework.Tests.Visual.Audio
             ContainerWithEffect noEffectContainer;
             FillFlowContainer<ContainerWithEffect> effectContainers;
 
-            Child = noEffectContainer = new ContainerWithEffect("no effect", Color4.Black)
+            Child = noEffectContainer = new ContainerWithEffect("no effect", Colour4.Black)
             {
                 RelativeSizeAxes = Axes.Both,
                 Size = new Vector2(1),
@@ -46,7 +45,7 @@ namespace osu.Framework.Tests.Visual.Audio
             {
                 float centre = 150 + 50 * i;
 
-                effectContainers.Add(new ContainerWithEffect($"<{centre}Hz", Color4.Blue)
+                effectContainers.Add(new ContainerWithEffect($"<{centre}Hz", Colour4.Blue)
                 {
                     Size = new Vector2(100),
                     Effects =
@@ -90,7 +89,7 @@ namespace osu.Framework.Tests.Visual.Audio
                         new Box
                         {
                             RelativeSizeAxes = Axes.Both,
-                            Colour = Color4.HotPink,
+                            Colour = Colour4.HotPink,
                         },
                         new SpriteIcon
                         {
@@ -157,7 +156,7 @@ namespace osu.Framework.Tests.Visual.Audio
 
             private readonly Drawable background;
 
-            public ContainerWithEffect(string name, Color4 colour)
+            public ContainerWithEffect(string name, Colour4 colour)
             {
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;

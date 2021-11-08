@@ -4,14 +4,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input;
 using osu.Framework.Localisation;
-using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Framework.Graphics.Cursor
 {
@@ -108,8 +108,8 @@ namespace osu.Framework.Graphics.Cursor
                 // We only need to check 2 of the 4 vertices, because we only allow affine transformations
                 // and the quad is therefore symmetric around the centre.
                 boundingRadius = Math.Max(
-                    (cursorQuad.TopLeft - cursorCentre).Length,
-                    (cursorQuad.TopRight - cursorCentre).Length);
+                    (cursorQuad.TopLeft - cursorCentre).Length(),
+                    (cursorQuad.TopRight - cursorCentre).Length());
             }
 
             Vector2 southEast = new Vector2(1).Normalized();
@@ -336,7 +336,7 @@ namespace osu.Framework.Graphics.Cursor
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = Color4.Gray,
+                        Colour = Colour4.Gray,
                     },
                     text = new SpriteText
                     {

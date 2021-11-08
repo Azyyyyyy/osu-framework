@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Reflection;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.Containers;
@@ -13,7 +14,6 @@ using osu.Framework.Graphics.Primitives;
 using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Utils;
-using osuTK;
 
 namespace osu.Framework.Graphics.Visualisation
 {

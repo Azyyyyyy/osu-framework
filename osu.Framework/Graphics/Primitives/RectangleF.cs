@@ -5,8 +5,8 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Numerics;
 using System.Runtime.InteropServices;
-using osuTK;
 
 namespace osu.Framework.Graphics.Primitives
 {
@@ -50,7 +50,7 @@ namespace osu.Framework.Graphics.Primitives
         }
 
         /// <summary>Gets or sets the coordinates of the upper-left corner of this <see cref="RectangleF"/> structure.</summary>
-        /// <returns>A <see cref="osuTK.Vector2"/> that represents the upper-left corner of this <see cref="RectangleF"/> structure.</returns>
+        /// <returns>A <see cref="Vector2"/> that represents the upper-left corner of this <see cref="RectangleF"/> structure.</returns>
         /// <filterpriority>1</filterpriority>
         [Browsable(false)]
         public Vector2 Location
@@ -64,7 +64,7 @@ namespace osu.Framework.Graphics.Primitives
         }
 
         /// <summary>Gets or sets the size of this <see cref="RectangleF"/>.</summary>
-        /// <returns>A <see cref="osuTK.Vector2"/> that represents the width and height of this <see cref="RectangleF"/> structure.</returns>
+        /// <returns>A <see cref="Vector2"/> that represents the width and height of this <see cref="RectangleF"/> structure.</returns>
         /// <filterpriority>1</filterpriority>
         [Browsable(false)]
         public Vector2 Size
@@ -339,7 +339,7 @@ namespace osu.Framework.Graphics.Primitives
                 Math.Max(0.0f, Math.Max(localSpacePos.Y - Bottom, Top - localSpacePos.Y))
             );
 
-            return dist.LengthSquared;
+            return dist.LengthSquared();
         }
 
         internal float DistanceExponentiated(Vector2 localSpacePos, float exponent)

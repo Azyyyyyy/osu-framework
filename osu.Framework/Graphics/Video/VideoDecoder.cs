@@ -2,7 +2,6 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using FFmpeg.AutoGen;
-using osuTK;
 using osu.Framework.Graphics.Textures;
 using System;
 using System.Collections.Concurrent;
@@ -19,6 +18,7 @@ using osu.Framework.Bindables;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
+using Silk.NET.Maths;
 using AGffmpeg = FFmpeg.AutoGen.ffmpeg;
 
 namespace osu.Framework.Graphics.Video
@@ -246,15 +246,15 @@ namespace osu.Framework.Graphics.Video
         }
 
         // https://en.wikipedia.org/wiki/YCbCr
-        public Matrix3 GetConversionMatrix()
+        public Matrix3X3<float> GetConversionMatrix()
         {
             if (codecContext == null)
-                return Matrix3.Zero;
+                return Extensions.MatrixExtensions.MatrixExtensions.Zero;
 
             switch (codecContext->colorspace)
             {
                 case AVColorSpace.AVCOL_SPC_BT709:
-                    return new Matrix3(1.164f, 1.164f, 1.164f,
+                    return new Matrix3X3<float>(1.164f, 1.164f, 1.164f,
                         0.000f, -0.213f, 2.112f,
                         1.793f, -0.533f, 0.000f);
 
@@ -262,7 +262,7 @@ namespace osu.Framework.Graphics.Video
                 case AVColorSpace.AVCOL_SPC_SMPTE170M:
                 case AVColorSpace.AVCOL_SPC_SMPTE240M:
                 default:
-                    return new Matrix3(1.164f, 1.164f, 1.164f,
+                    return new Matrix3X3<float>(1.164f, 1.164f, 1.164f,
                         0.000f, -0.392f, 2.017f,
                         1.596f, -0.813f, 0.000f);
             }

@@ -1,14 +1,13 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Numerics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Utils;
 using osu.Framework.Testing;
-using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Framework.Tests.Visual.Containers
 {
@@ -32,7 +31,7 @@ namespace osu.Framework.Tests.Visual.Containers
                     {
                         new Box
                         {
-                            Colour = Color4.Yellow,
+                            Colour = Colour4.Yellow,
                             RelativeSizeAxes = Axes.Both,
                         },
                         cursorContainer = new TestCursorContainer
@@ -80,7 +79,7 @@ namespace osu.Framework.Tests.Visual.Containers
             protected override Drawable CreateCursor() => new Circle
             {
                 Size = new Vector2(50),
-                Colour = Color4.Red,
+                Colour = Colour4.Red,
                 Origin = Anchor.Centre,
             };
         }

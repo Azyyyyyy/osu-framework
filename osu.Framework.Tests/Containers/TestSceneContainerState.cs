@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using System.Numerics;
 using System.Threading;
 using NUnit.Framework;
 using osu.Framework.Allocation;
@@ -12,7 +13,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
 using osu.Framework.Tests.Visual;
-using osuTK;
 
 namespace osu.Framework.Tests.Containers
 {

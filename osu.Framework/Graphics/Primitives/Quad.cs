@@ -2,10 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using osuTK;
 using osu.Framework.Utils;
+using Silk.NET.Maths;
 
 namespace osu.Framework.Graphics.Primitives
 {
@@ -45,14 +46,14 @@ namespace osu.Framework.Graphics.Primitives
                 new Vector2(rectangle.Left, rectangle.Bottom),
                 new Vector2(rectangle.Right, rectangle.Bottom));
 
-        public static Quad operator *(Quad r, Matrix3 m) =>
+        public static Quad operator *(Quad r, Matrix3X3<float> m) =>
             new Quad(
                 Vector2Extensions.Transform(r.TopLeft, m),
                 Vector2Extensions.Transform(r.TopRight, m),
                 Vector2Extensions.Transform(r.BottomLeft, m),
                 Vector2Extensions.Transform(r.BottomRight, m));
 
-        public Matrix2 BasisTransform
+        public Matrix2X2<float> BasisTransform
         {
             get
             {
@@ -60,12 +61,12 @@ namespace osu.Framework.Graphics.Primitives
                 Vector2 row1 = BottomLeft - TopLeft;
 
                 if (row0 != Vector2.Zero)
-                    row0 /= row0.LengthSquared;
+                    row0 /= row0.LengthSquared();
 
                 if (row1 != Vector2.Zero)
-                    row1 /= row1.LengthSquared;
+                    row1 /= row1.LengthSquared();
 
-                return new Matrix2(
+                return new Matrix2X2<float>(
                     row0.X, row0.Y,
                     row1.X, row1.Y);
             }

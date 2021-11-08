@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using System.Numerics;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Cursor;
@@ -12,8 +13,6 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Localisation;
 using osu.Framework.Utils;
-using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Framework.Graphics.Visualisation
 {
@@ -216,8 +215,8 @@ namespace osu.Framework.Graphics.Visualisation
                     drawColour = DrawColourInfo.Colour;
                     drawColour.ApplyChild(
                         Precision.AlmostBigger(Source.AverageUsagesPerFrame, 1)
-                            ? Interpolation.ValueAt(Source.AverageUsagesPerFrame, Color4.DarkGray, Color4.Red, 0, 200)
-                            : Color4.Transparent);
+                            ? Interpolation.ValueAt(Source.AverageUsagesPerFrame, Colour4.DarkGray, Colour4.Red, 0, 200)
+                            : Colour4.Transparent);
 
                     base.Draw(vertexAction);
 
@@ -238,7 +237,7 @@ namespace osu.Framework.Graphics.Visualisation
                     var shrunkenQuad = ScreenSpaceDrawQuad.AABBFloat.Shrink(border_width);
 
                     // background
-                    DrawQuad(Texture, shrunkenQuad, Color4.Black, null, vertexAction);
+                    DrawQuad(Texture, shrunkenQuad, Colour4.Black, null, vertexAction);
 
                     float aspect = (float)texture.Width / texture.Height;
 
@@ -259,7 +258,7 @@ namespace osu.Framework.Graphics.Visualisation
 
                     // texture
                     texture.Bind();
-                    DrawQuad(texture, shrunkenQuad, Color4.White, null, vertexAction);
+                    DrawQuad(texture, shrunkenQuad, Colour4.White, null, vertexAction);
                 }
 
                 protected internal override bool CanDrawOpaqueInterior => false;

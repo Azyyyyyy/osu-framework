@@ -1,16 +1,17 @@
-﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
+// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osuTK;
-using osuTK.Graphics;
-using osuTK.Graphics.ES30;
+using System.Numerics;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions.MatrixExtensions;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Utils;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Layout;
+using Silk.NET.Maths;
+using Silk.NET.OpenGL;
 
 namespace osu.Framework.Graphics.Containers
 {
@@ -26,7 +27,7 @@ namespace osu.Framework.Graphics.Containers
     public class BufferedContainer : BufferedContainer<Drawable>
     {
         /// <inheritdoc />
-        public BufferedContainer(RenderbufferInternalFormat[] formats = null, bool pixelSnapping = false, bool cachedFrameBuffer = false)
+        public BufferedContainer(InternalFormat[] formats = null, bool pixelSnapping = false, bool cachedFrameBuffer = false)
             : base(formats, pixelSnapping, cachedFrameBuffer)
         {
         }
@@ -100,10 +101,10 @@ namespace osu.Framework.Graphics.Containers
             }
         }
 
-        private ColourInfo effectColour = Color4.White;
+        private ColourInfo effectColour = Colour4.White;
 
         /// <summary>
-        /// The multiplicative colour of drawn buffered object after applying all effects (e.g. blur). Default is <see cref="Color4.White"/>.
+        /// The multiplicative colour of drawn buffered object after applying all effects (e.g. blur). Default is <see cref="Colour4.White"/>.
         /// Does not affect the original which is drawn when <see cref="DrawOriginal"/> is true.
         /// </summary>
         public ColourInfo EffectColour
@@ -158,12 +159,12 @@ namespace osu.Framework.Graphics.Containers
             }
         }
 
-        private Color4 backgroundColour = new Color4(0, 0, 0, 0);
+        private Colour4 backgroundColour = new Colour4(0, 0, 0, 0);
 
         /// <summary>
         /// The background colour of the framebuffer. Transparent black by default.
         /// </summary>
-        public Color4 BackgroundColour
+        public Colour4 BackgroundColour
         {
             get => backgroundColour;
             set
@@ -253,7 +254,7 @@ namespace osu.Framework.Graphics.Containers
         /// or the size of the container (i.e. framebuffer) changes.
         /// When disabled, drawing will be clipped to the game window bounds. Enabling can allow drawing larger than (or outside) the game window bounds.
         /// </param>
-        public BufferedContainer(RenderbufferInternalFormat[] formats = null, bool pixelSnapping = false, bool cachedFrameBuffer = false)
+        public BufferedContainer(InternalFormat[] formats = null, bool pixelSnapping = false, bool cachedFrameBuffer = false)
         {
             UsingCachedFrameBuffer = cachedFrameBuffer;
 
@@ -317,7 +318,7 @@ namespace osu.Framework.Graphics.Containers
 
                 if (!RedrawOnScale)
                 {
-                    Matrix3 scaleMatrix = Matrix3.CreateScale(DrawInfo.MatrixInverse.ExtractScale());
+                    var scaleMatrix = Matrix3X3.CreateScale(DrawInfo.MatrixInverse.ExtractScale().ToGeneric());
                     Vector2Extensions.Transform(ref drawSize, ref scaleMatrix, out drawSize);
                 }
 
@@ -364,7 +365,7 @@ namespace osu.Framework.Graphics.Containers
                 var blending = Blending;
                 blending.ApplyDefaultToInherited();
 
-                return new DrawColourInfo(Color4.White, blending);
+                return new DrawColourInfo(Colour4.White, blending);
             }
         }
 

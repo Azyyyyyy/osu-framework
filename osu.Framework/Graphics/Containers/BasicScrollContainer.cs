@@ -1,8 +1,9 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Numerics;
+using osu.Framework.Extensions;
 using osu.Framework.Graphics.Shapes;
-using osuTK;
 
 namespace osu.Framework.Graphics.Containers
 {
@@ -40,10 +41,8 @@ namespace osu.Framework.Graphics.Containers
 
             public override void ResizeTo(float val, int duration = 0, Easing easing = Easing.None)
             {
-                Vector2 size = new Vector2(dim_size)
-                {
-                    [(int)ScrollDirection] = val
-                };
+                Vector2 size = new Vector2(dim_size);
+                size.SetIndex((int)ScrollDirection, val);
                 this.ResizeTo(size, duration, easing);
             }
         }

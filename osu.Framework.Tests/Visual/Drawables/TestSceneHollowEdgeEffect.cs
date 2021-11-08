@@ -1,14 +1,13 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Numerics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Effects;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Testing;
-using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Framework.Tests.Visual.Drawables
 {
@@ -26,28 +25,28 @@ namespace osu.Framework.Tests.Visual.Drawables
                 new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Glow,
-                    Colour = Color4.Khaki,
+                    Colour = Colour4.Khaki,
                     Radius = size,
                     Hollow = true,
                 },
                 new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Glow,
-                    Colour = Color4.Khaki,
+                    Colour = Colour4.Khaki,
                     Radius = size,
                     Hollow = true,
                 },
                 new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Glow,
-                    Colour = Color4.Khaki,
+                    Colour = Colour4.Khaki,
                     Radius = size,
                     Hollow = true,
                 },
                 new EdgeEffectParameters
                 {
                     Type = EdgeEffectType.Glow,
-                    Colour = Color4.Khaki,
+                    Colour = Colour4.Khaki,
                     Radius = size,
                     Hollow = true,
                 },
@@ -77,7 +76,7 @@ namespace osu.Framework.Tests.Visual.Drawables
                             new Box
                             {
                                 RelativeSizeAxes = Axes.Both,
-                                Colour = Color4.Aqua,
+                                Colour = Colour4.Aqua,
                                 Alpha = alphas[i],
                             },
                         },

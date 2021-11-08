@@ -1,9 +1,8 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
+using System.Numerics;
 using osu.Framework.Graphics.OpenGL.Buffers;
-using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Framework.Graphics
 {
@@ -20,7 +19,7 @@ namespace osu.Framework.Graphics
         /// This should generally be transparent-black or transparent-white, but can also be used to
         /// colourise the background colour of the <see cref="FrameBuffer"/> with non-transparent colours.
         /// </remarks>
-        Color4 BackgroundColour { get; }
+        Colour4 BackgroundColour { get; }
 
         /// <summary>
         /// The colour with which the <see cref="FrameBuffer"/>s are rendered to the screen.

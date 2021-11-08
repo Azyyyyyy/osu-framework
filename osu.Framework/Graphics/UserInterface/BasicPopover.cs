@@ -3,9 +3,9 @@
 
 #nullable enable
 
+using System.Numerics;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics.Shapes;
-using osuTK;
 
 namespace osu.Framework.Graphics.UserInterface
 {

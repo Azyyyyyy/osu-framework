@@ -1,13 +1,17 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osuTK;
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Utils;
+using Silk.NET.Maths;
+using osu.Framework.Extensions;
+using osu.Framework.Extensions.MatrixExtensions;
+using Vector2Extensions = osu.Framework.Graphics.Vector2Extensions;
 
 namespace osu.Framework.Physics
 {
@@ -71,7 +75,7 @@ namespace osu.Framework.Physics
 
             // Add orthogonal direction to rotation, scaled by distance from centre
             // to the velocity of our centre of mass.
-            return Velocity + diff.PerpendicularLeft * AngularVelocity;
+            return Velocity + diff.PerpendicularLeft() * AngularVelocity;
         }
 
         /// <summary>
@@ -85,16 +89,16 @@ namespace osu.Framework.Physics
         /// </summary>
         protected List<Vector2> Normals = new List<Vector2>();
 
-        protected Matrix3 ScreenToSimulationSpace => Simulation.DrawInfo.MatrixInverse;
+        protected Matrix3X3<float> ScreenToSimulationSpace => Simulation.DrawInfo.MatrixInverse;
 
-        protected Matrix3 SimulationToScreenSpace => Simulation.DrawInfo.Matrix;
+        protected Matrix3X3<float> SimulationToScreenSpace => Simulation.DrawInfo.Matrix;
 
         /// <summary>
         /// Computes the moment of inertia.
         /// </summary>
         protected float ComputeI()
         {
-            Matrix3 mat = DrawInfo.Matrix * Parent.DrawInfo.MatrixInverse;
+            Matrix3X3<float> mat = DrawInfo.Matrix * Parent.DrawInfo.MatrixInverse;
             Vector2 size = DrawSize;
 
             // Inertial moment for a linearly transformed rectangle with a given size around its center.
@@ -122,12 +126,12 @@ namespace osu.Framework.Physics
                 Vector2 a = corners[i];
                 Vector2 b = corners[(i + 1) % 4];
                 Vector2 diff = b - a;
-                float length = diff.Length;
+                float length = diff.Length();
                 Vector2 dir = diff / length;
 
                 float usableLength = Math.Max(length - 2 * cornerRadius, 0);
 
-                Vector2 normal = (b - a).PerpendicularRight.Normalized();
+                Vector2 normal = (b - a).PerpendicularRight().Normalized();
 
                 for (int j = 0; j < amount_side_steps; ++j)
                 {
@@ -167,8 +171,8 @@ namespace osu.Framework.Physics
             }
 
             // To simulation space
-            Matrix3 mat = DrawInfo.Matrix * ScreenToSimulationSpace;
-            Matrix3 normMat = mat.Inverted();
+            Matrix3X3<float> mat = DrawInfo.Matrix * ScreenToSimulationSpace;
+            Matrix3X3<float> normMat = mat.Inverted();
             normMat.Transpose();
 
             // Remove translation
@@ -254,7 +258,7 @@ namespace osu.Framework.Physics
         /// </summary>
         public void ReadState()
         {
-            Matrix3 mat = Parent.DrawInfo.Matrix * ScreenToSimulationSpace;
+            Matrix3X3<float> mat = Parent.DrawInfo.Matrix * ScreenToSimulationSpace;
             Centre = Vector2Extensions.Transform(BoundingBox.Centre, mat);
             RotationRadians = MathUtils.DegreesToRadians(Rotation); // TODO: Fix rotations
 
@@ -267,7 +271,7 @@ namespace osu.Framework.Physics
         /// </summary>
         public virtual void ApplyState()
         {
-            Matrix3 mat = SimulationToScreenSpace * Parent.DrawInfo.MatrixInverse;
+            Matrix3X3<float> mat = SimulationToScreenSpace * Parent.DrawInfo.MatrixInverse;
             Position = Vector2Extensions.Transform(Centre, mat) + (Position - BoundingBox.Centre);
             Rotation = MathUtils.RadiansToDegrees(RotationRadians); // TODO: Fix rotations
         }

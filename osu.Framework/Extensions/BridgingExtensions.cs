@@ -2,11 +2,11 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using osu.Framework.Platform;
-using TKVector2 = osuTK.Vector2;
+using TKVector2 = System.Numerics.Vector2;
 using SNVector2 = System.Numerics.Vector2;
 using SDPoint = System.Drawing.Point;
 using SDSize = System.Drawing.Size;
-using TKWindowState = osuTK.WindowState;
+using TKWindowState = Silk.NET.Windowing.WindowState;
 
 namespace osu.Framework.Extensions
 {

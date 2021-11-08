@@ -1,8 +1,7 @@
 ﻿// Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osuTK;
-using osuTK.Graphics;
+using System.Numerics;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
@@ -21,7 +20,7 @@ namespace osu.Framework.Graphics.UserInterface
         /// <remarks>
         /// The changes done to this property are only applied when <see cref="Checkbox.Current"/>'s value changes.
         /// </remarks>
-        public Color4 CheckedColor { get; set; } = FrameworkColour.YellowGreen;
+        public Colour4 CheckedColor { get; set; } = FrameworkColour.YellowGreen;
 
         /// <summary>
         /// The color of the checkbox when the checkbox is not checked. Default is an white with low opacity.
@@ -29,7 +28,7 @@ namespace osu.Framework.Graphics.UserInterface
         /// <remarks>
         /// The changes done to this property are only applied when <see cref="Checkbox.Current"/>'s value changes.
         /// </remarks>
-        public Color4 UncheckedColor { get; set; } = FrameworkColour.Green;
+        public Colour4 UncheckedColor { get; set; } = FrameworkColour.Green;
 
         /// <summary>
         /// The length of the duration between checked and unchecked.

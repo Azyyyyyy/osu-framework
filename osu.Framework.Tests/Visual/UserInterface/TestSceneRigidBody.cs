@@ -2,13 +2,12 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Numerics;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.UserInterface;
 using osu.Framework.Utils;
 using osu.Framework.Physics;
-using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Framework.Tests.Visual.UserInterface
 {
@@ -116,7 +115,7 @@ namespace osu.Framework.Tests.Visual.UserInterface
                 Position = new Vector2((float)random.NextDouble(), (float)random.NextDouble()) * 1000,
                 Size = new Vector2((float)random.NextDouble(), (float)random.NextDouble()) * 200,
                 Rotation = (float)random.NextDouble() * 360,
-                Colour = new Color4(253, 253, 253, 255),
+                Colour = new Colour4(253, 253, 253, 255),
             });
 
             // Circles
@@ -129,7 +128,7 @@ namespace osu.Framework.Tests.Visual.UserInterface
                     Size = size,
                     Rotation = (float)random.NextDouble() * 360,
                     CornerRadius = size.X / 2,
-                    Colour = new Color4(253, 253, 253, 255),
+                    Colour = new Colour4(253, 253, 253, 255),
                     Masking = true,
                 };
             });
@@ -145,7 +144,7 @@ namespace osu.Framework.Tests.Visual.UserInterface
                     Rotation = (float)random.NextDouble() * 360,
                     Shear = new Vector2((float)random.NextDouble(), (float)random.NextDouble()) * 2 - new Vector2(1),
                     CornerRadius = (float)random.NextDouble() * Math.Min(size.X, size.Y) / 2,
-                    Colour = new Color4(253, 253, 253, 255),
+                    Colour = new Colour4(253, 253, 253, 255),
                     Masking = true,
                 };
             });

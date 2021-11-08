@@ -2,14 +2,14 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Numerics;
 using osu.Framework.Allocation;
 using osu.Framework.Graphics.OpenGL;
 using osu.Framework.Graphics.OpenGL.Buffers;
 using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Statistics;
-using osuTK;
-using osuTK.Graphics;
+using Silk.NET.Maths;
 
 namespace osu.Framework.Graphics
 {
@@ -34,7 +34,7 @@ namespace osu.Framework.Graphics
 
         protected RectangleF DrawRectangle { get; private set; }
 
-        private Color4 backgroundColour;
+        private Colour4 backgroundColour;
         private RectangleF screenSpaceDrawRectangle;
         private Vector2 frameBufferScale;
         private Vector2 frameBufferSize;
@@ -53,7 +53,7 @@ namespace osu.Framework.Graphics
 
             backgroundColour = Source.BackgroundColour;
             screenSpaceDrawRectangle = Source.ScreenSpaceDrawQuad.AABBFloat;
-            DrawColourInfo = Source.FrameBufferDrawColour ?? new DrawColourInfo(Color4.White, base.DrawColourInfo.Blending);
+            DrawColourInfo = Source.FrameBufferDrawColour ?? new DrawColourInfo(Colour4.White, base.DrawColourInfo.Blending);
             frameBufferScale = Source.FrameBufferScale;
 
             clipDrawRectangle();
@@ -160,7 +160,7 @@ namespace osu.Framework.Graphics
             {
                 ScreenSpaceAABB = screenSpaceMaskingRect,
                 MaskingRect = screenSpaceDrawRectangle,
-                ToMaskingSpace = Matrix3.Identity,
+                ToMaskingSpace = Matrix3X3<float>.Identity,
                 BlendRange = 1,
                 AlphaExponent = 1,
             }, true);

@@ -3,16 +3,16 @@
 
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
-using osuTK;
-using osuTK.Graphics.ES30;
+using Silk.NET.OpenGL;
 
 namespace osu.Framework.Graphics.OpenGL.Buffers
 {
     public class FrameBuffer : IDisposable
     {
-        private int frameBuffer = -1;
+        private uint frameBuffer = 0;
 
         public TextureGL Texture { get; private set; }
 
@@ -20,10 +20,10 @@ namespace osu.Framework.Graphics.OpenGL.Buffers
 
         private bool isInitialised;
 
-        private readonly All filteringMode;
-        private readonly RenderbufferInternalFormat[] renderBufferFormats;
+        private readonly GLEnum filteringMode;
+        private readonly InternalFormat[] renderBufferFormats;
 
-        public FrameBuffer(RenderbufferInternalFormat[] renderBufferFormats = null, All filteringMode = All.Linear)
+        public FrameBuffer(InternalFormat[] renderBufferFormats = null, GLEnum filteringMode = GLEnum.Linear)
         {
             this.renderBufferFormats = renderBufferFormats;
             this.filteringMode = filteringMode;
@@ -57,12 +57,12 @@ namespace osu.Framework.Graphics.OpenGL.Buffers
 
         private void initialise()
         {
-            frameBuffer = GL.GenFramebuffer();
+            frameBuffer = GLWrapper.GL.GenFramebuffer();
             Texture = new FrameBufferTexture(Size, filteringMode);
 
             GLWrapper.BindFrameBuffer(frameBuffer);
 
-            GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget2d.Texture2D, Texture.TextureId, 0);
+            GLWrapper.GL.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2D, Texture.TextureId, 0);
             GLWrapper.BindTexture(null);
 
             if (renderBufferFormats != null)
@@ -145,7 +145,7 @@ namespace osu.Framework.Graphics.OpenGL.Buffers
 
         private class FrameBufferTexture : TextureGLSingle
         {
-            public FrameBufferTexture(Vector2 size, All filteringMode = All.Linear)
+            public FrameBufferTexture(Vector2 size, GLEnum filteringMode = GLEnum.Linear)
                 : base((int)Math.Ceiling(size.X), (int)Math.Ceiling(size.Y), true, filteringMode)
             {
                 BypassTextureUploadQueueing = true;

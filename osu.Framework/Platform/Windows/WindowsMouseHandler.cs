@@ -3,12 +3,12 @@
 
 using System;
 using System.Drawing;
+using System.Numerics;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Input.Handlers.Mouse;
 using osu.Framework.Input.StateChanges;
 using osu.Framework.Platform.Windows.Native;
-using osuTK;
-using SDL2;
+using Silk.NET.SDL;
 
 // ReSharper disable UnusedParameter.Local (Class regularly handles native events where we don't consume all parameters)
 
@@ -22,8 +22,9 @@ namespace osu.Framework.Platform.Windows
     {
         private const int raw_input_coordinate_space = 65535;
 
-        private SDL.SDL_WindowsMessageHook callback;
+        private WindowsMessageHook callback;
         private SDL2DesktopWindow window;
+        private readonly Sdl sdl = SdlProvider.SDL.Value;
 
         public override bool IsActive => Enabled.Value;
 
@@ -37,7 +38,7 @@ namespace osu.Framework.Platform.Windows
 
             Enabled.BindValueChanged(enabled =>
             {
-                host.InputThread.Scheduler.Add(() => SDL.SDL_SetWindowsMessageHook(enabled.NewValue ? callback : null, IntPtr.Zero));
+                host.InputThread.Scheduler.Add(() => sdl.SetWindowsMessageHook(enabled.NewValue ? callback : null, (void*)0));
             }, true);
 
             return base.Initialize(host);
@@ -48,7 +49,7 @@ namespace osu.Framework.Platform.Windows
             // handled via custom logic below.
         }
 
-        private IntPtr onWndProc(IntPtr userData, IntPtr hWnd, uint message, ulong wParam, long lParam)
+        private IntPtr onWndProc(void* userData, void* hWnd, uint message, ulong wParam, long lParam)
         {
             if (!Enabled.Value)
                 return IntPtr.Zero;

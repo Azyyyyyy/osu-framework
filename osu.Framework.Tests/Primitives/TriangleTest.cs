@@ -3,8 +3,8 @@
 
 using NUnit.Framework;
 using osu.Framework.Graphics.Primitives;
-using osuTK;
 using System.Collections;
+using System.Numerics;
 
 namespace osu.Framework.Tests.Primitives
 {

@@ -3,18 +3,20 @@
 
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
-using SDL2;
+using Silk.NET.SDL;
 
 namespace osu.Framework.Platform.SDL2
 {
     public class SDL2ReadableKeyCombinationProvider : ReadableKeyCombinationProvider
     {
+        private readonly Sdl sdl = SdlProvider.SDL.Value;
+
         protected override string GetReadableKey(InputKey key)
         {
-            var keycode = SDL.SDL_GetKeyFromScancode(key.ToScancode());
+            var keycode = (KeyCode)sdl.GetKeyFromScancode(key.ToScancode());
 
             // early return if unknown. probably because key isn't a keyboard key, or doesn't map to an `SDL_Scancode`.
-            if (keycode == SDL.SDL_Keycode.SDLK_UNKNOWN)
+            if (keycode == KeyCode.KUnknown)
                 return base.GetReadableKey(key);
 
             string name;
@@ -23,7 +25,7 @@ namespace osu.Framework.Platform.SDL2
             if (TryGetNameFromKeycode(keycode, out name))
                 return name;
 
-            name = SDL.SDL_GetKeyName(keycode);
+            name = sdl.GetKeyNameS((int)keycode);
 
             // fall back if SDL couldn't find a name.
             if (string.IsNullOrEmpty(name))
@@ -31,7 +33,7 @@ namespace osu.Framework.Platform.SDL2
 
             // true if SDL_GetKeyName() returned a proper key/scancode name.
             // see https://github.com/libsdl-org/SDL/blob/release-2.0.16/src/events/SDL_keyboard.c#L1012
-            if (((int)keycode & SDL.SDLK_SCANCODE_MASK) != 0)
+            if (((int)keycode & (1 << 30)) != 0)
                 return name;
 
             // SDL_GetKeyName() returned a unicode character that would be produced if that key was pressed.
@@ -45,175 +47,175 @@ namespace osu.Framework.Platform.SDL2
         /// <remarks>
         /// Should be overriden per-platform to provide platform-specific names for applicable keys.
         /// </remarks>
-        protected virtual bool TryGetNameFromKeycode(SDL.SDL_Keycode keycode, out string name)
+        protected virtual bool TryGetNameFromKeycode(KeyCode keycode, out string name)
         {
             switch (keycode)
             {
-                case SDL.SDL_Keycode.SDLK_RETURN:
+                case KeyCode.KReturn:
                     name = "Enter";
                     return true;
 
-                case SDL.SDL_Keycode.SDLK_ESCAPE:
+                case KeyCode.KEscape:
                     name = "Esc";
                     return true;
 
-                case SDL.SDL_Keycode.SDLK_BACKSPACE:
+                case KeyCode.KBackspace:
                     name = "Backsp";
                     return true;
 
-                case SDL.SDL_Keycode.SDLK_TAB:
+                case KeyCode.KTab:
                     name = "Tab";
                     return true;
 
-                case SDL.SDL_Keycode.SDLK_SPACE:
+                case KeyCode.KSpace:
                     name = "Space";
                     return true;
 
-                case SDL.SDL_Keycode.SDLK_PLUS:
+                case KeyCode.KPlus:
                     name = "Plus";
                     return true;
 
-                case SDL.SDL_Keycode.SDLK_MINUS:
+                case KeyCode.KMinus:
                     name = "Minus";
                     return true;
 
-                case SDL.SDL_Keycode.SDLK_DELETE:
+                case KeyCode.KDelete:
                     name = "Del";
                     return true;
 
-                case SDL.SDL_Keycode.SDLK_CAPSLOCK:
+                case KeyCode.KCapslock:
                     name = "Caps";
                     return true;
 
-                case SDL.SDL_Keycode.SDLK_INSERT:
+                case KeyCode.KInsert:
                     name = "Ins";
                     return true;
 
-                case SDL.SDL_Keycode.SDLK_PAGEUP:
+                case KeyCode.KPageup:
                     name = "PgUp";
                     return true;
 
-                case SDL.SDL_Keycode.SDLK_PAGEDOWN:
+                case KeyCode.KPagedown:
                     name = "PgDn";
                     return true;
 
-                case SDL.SDL_Keycode.SDLK_NUMLOCKCLEAR:
+                case KeyCode.KNumlockclear:
                     name = "NumLock";
                     return true;
 
-                case SDL.SDL_Keycode.SDLK_KP_DIVIDE:
+                case KeyCode.KKPDivide:
                     name = "NumpadDivide";
                     return true;
 
-                case SDL.SDL_Keycode.SDLK_KP_MULTIPLY:
+                case KeyCode.KKPMultiply:
                     name = "NumpadMultiply";
                     return true;
 
-                case SDL.SDL_Keycode.SDLK_KP_MINUS:
+                case KeyCode.KKPMinus:
                     name = "NumpadMinus";
                     return true;
 
-                case SDL.SDL_Keycode.SDLK_KP_PLUS:
+                case KeyCode.KKPPlus:
                     name = "NumpadPlus";
                     return true;
 
-                case SDL.SDL_Keycode.SDLK_KP_ENTER:
+                case KeyCode.KKPEnter:
                     name = "NumpadEnter";
                     return true;
 
-                case SDL.SDL_Keycode.SDLK_KP_PERIOD:
+                case KeyCode.KKPPeriod:
                     name = "NumpadDecimal";
                     return true;
 
-                case SDL.SDL_Keycode.SDLK_KP_0:
+                case KeyCode.KKP0:
                     name = "Numpad0";
                     return true;
 
-                case SDL.SDL_Keycode.SDLK_KP_1:
+                case KeyCode.KKP1:
                     name = "Numpad1";
                     return true;
 
-                case SDL.SDL_Keycode.SDLK_KP_2:
+                case KeyCode.KKP2:
                     name = "Numpad2";
                     return true;
 
-                case SDL.SDL_Keycode.SDLK_KP_3:
+                case KeyCode.KKP3:
                     name = "Numpad3";
                     return true;
 
-                case SDL.SDL_Keycode.SDLK_KP_4:
+                case KeyCode.KKP4:
                     name = "Numpad4";
                     return true;
 
-                case SDL.SDL_Keycode.SDLK_KP_5:
+                case KeyCode.KKP5:
                     name = "Numpad5";
                     return true;
 
-                case SDL.SDL_Keycode.SDLK_KP_6:
+                case KeyCode.KKP6:
                     name = "Numpad6";
                     return true;
 
-                case SDL.SDL_Keycode.SDLK_KP_7:
+                case KeyCode.KKP7:
                     name = "Numpad7";
                     return true;
 
-                case SDL.SDL_Keycode.SDLK_KP_8:
+                case KeyCode.KKP8:
                     name = "Numpad8";
                     return true;
 
-                case SDL.SDL_Keycode.SDLK_KP_9:
+                case KeyCode.KKP9:
                     name = "Numpad9";
                     return true;
 
-                case SDL.SDL_Keycode.SDLK_LCTRL:
+                case KeyCode.KLctrl:
                     name = "LCtrl";
                     return true;
 
-                case SDL.SDL_Keycode.SDLK_LSHIFT:
+                case KeyCode.KLshift:
                     name = "LShift";
                     return true;
 
-                case SDL.SDL_Keycode.SDLK_LALT:
+                case KeyCode.KLalt:
                     name = "LAlt";
                     return true;
 
-                case SDL.SDL_Keycode.SDLK_RCTRL:
+                case KeyCode.KRctrl:
                     name = "RCtrl";
                     return true;
 
-                case SDL.SDL_Keycode.SDLK_RSHIFT:
+                case KeyCode.KRshift:
                     name = "RShift";
                     return true;
 
-                case SDL.SDL_Keycode.SDLK_RALT:
+                case KeyCode.KRalt:
                     name = "RAlt";
                     return true;
 
-                case SDL.SDL_Keycode.SDLK_VOLUMEUP:
+                case KeyCode.KVolumeup:
                     name = "Vol. Up";
                     return true;
 
-                case SDL.SDL_Keycode.SDLK_VOLUMEDOWN:
+                case KeyCode.KVolumedown:
                     name = "Vol. Down";
                     return true;
 
-                case SDL.SDL_Keycode.SDLK_AUDIONEXT:
+                case KeyCode.KAudionext:
                     name = "Media Next";
                     return true;
 
-                case SDL.SDL_Keycode.SDLK_AUDIOPREV:
+                case KeyCode.KAudioprev:
                     name = "Media Previous";
                     return true;
 
-                case SDL.SDL_Keycode.SDLK_AUDIOSTOP:
+                case KeyCode.KAudiostop:
                     name = "Media Stop";
                     return true;
 
-                case SDL.SDL_Keycode.SDLK_AUDIOPLAY:
+                case KeyCode.KAudioplay:
                     name = "Media Play";
                     return true;
 
-                case SDL.SDL_Keycode.SDLK_AUDIOMUTE:
+                case KeyCode.KAudiomute:
                     name = "Mute";
                     return true;
 

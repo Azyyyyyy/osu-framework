@@ -12,8 +12,6 @@ using System.Security.Cryptography;
 using System.Text;
 using osu.Framework.Extensions.ObjectExtensions;
 using osu.Framework.Localisation;
-using osu.Framework.Platform;
-using osuTK;
 
 // this is an abusive thing to do, but it increases the visibility of Extension Methods to virtually every file.
 
@@ -295,18 +293,6 @@ namespace osu.Framework.Extensions
                 return md5.ComputeHash(Encoding.UTF8.GetBytes(input)).toLowercaseHex();
         }
 
-        public static DisplayIndex GetIndex(this DisplayDevice display)
-        {
-            if (display == null) return DisplayIndex.Default;
-
-            for (int i = 0; true; i++)
-            {
-                var device = DisplayDevice.GetDisplay((DisplayIndex)i);
-                if (device == null) return DisplayIndex.Default;
-                if (device == display) return (DisplayIndex)i;
-            }
-        }
-
         /// <summary>
         /// Standardise the path string using '/' as directory separator.
         /// Useful as output.
@@ -326,22 +312,5 @@ namespace osu.Framework.Extensions
         /// <returns>The path with DirectorySeparatorChar trimmed.</returns>
         public static string TrimDirectorySeparator(this string path)
             => path.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-
-        /// <summary>
-        /// Converts an osuTK <see cref="DisplayDevice"/> to a <see cref="Display"/> structure.
-        /// </summary>
-        /// <param name="device">The <see cref="DisplayDevice"/> to convert.</param>
-        /// <returns>A <see cref="Display"/> structure populated with the corresponding properties and <see cref="DisplayMode"/>s.</returns>
-        internal static Display ToDisplay(this DisplayDevice device) =>
-            new Display((int)device.GetIndex(), device.GetIndex().ToString(), device.Bounds, device.AvailableResolutions.Select(ToDisplayMode).ToArray());
-
-        /// <summary>
-        /// Converts an osuTK <see cref="DisplayResolution"/> to a <see cref="DisplayMode"/> structure.
-        /// It is not possible to retrieve the pixel format from <see cref="DisplayResolution"/>.
-        /// </summary>
-        /// <param name="resolution">The <see cref="DisplayResolution"/> to convert.</param>
-        /// <returns>A <see cref="DisplayMode"/> structure populated with the corresponding properties.</returns>
-        internal static DisplayMode ToDisplayMode(this DisplayResolution resolution) =>
-            new DisplayMode(null, new Size(resolution.Width, resolution.Height), resolution.BitsPerPixel, (int)Math.Round(resolution.RefreshRate), 0, 0);
     }
 }

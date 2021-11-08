@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using System.Numerics;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -12,8 +13,7 @@ using osu.Framework.Input;
 using osu.Framework.Input.Events;
 using osu.Framework.Platform;
 using osu.Framework.Input.Handlers.Mouse;
-using osuTK;
-using osuTK.Graphics;
+using Silk.NET.Input;
 
 namespace osu.Framework.Tests.Visual.Input
 {
@@ -85,7 +85,7 @@ namespace osu.Framework.Tests.Visual.Input
                     new Box
                     {
                         RelativeSizeAxes = Axes.Both,
-                        Colour = new Color4(1, 1, 1, 0.2f),
+                        Colour = new Colour4(1, 1, 1, 0.2f),
                     },
                     new FillFlowContainer
                     {
@@ -222,9 +222,9 @@ namespace osu.Framework.Tests.Visual.Input
                 return;
 
             if (visible)
-                host.Window.CursorState &= ~CursorState.Hidden;
+                host.Window.CursorState &= ~CursorMode.Hidden;
             else
-                host.Window.CursorState |= CursorState.Hidden;
+                host.Window.CursorState |= CursorMode.Hidden;
         }
 
         private void setConfineMouseModeConfig(bool enabled)

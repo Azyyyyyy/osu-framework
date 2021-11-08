@@ -3,10 +3,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 using osu.Framework.Allocation;
 using osu.Framework.Bindables;
 using osu.Framework.Development;
 using osu.Framework.Extensions.IEnumerableExtensions;
+using osu.Framework.Extensions.MatrixExtensions;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Graphics.UserInterface;
@@ -15,8 +17,6 @@ using osu.Framework.Layout;
 using osu.Framework.Localisation;
 using osu.Framework.Utils;
 using osu.Framework.Text;
-using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Framework.Graphics.Sprites
 {
@@ -188,12 +188,12 @@ namespace osu.Framework.Graphics.Sprites
             }
         }
 
-        private Color4 shadowColour = new Color4(0, 0, 0, 0.2f);
+        private Colour4 shadowColour = new Colour4(0, 0, 0, 0.2f);
 
         /// <summary>
         /// The colour of the shadow displayed around the text. A shadow will only be displayed if the <see cref="Shadow"/> property is set to true.
         /// </summary>
-        public Color4 ShadowColour
+        public Colour4 ShadowColour
         {
             get => shadowColour;
             set
@@ -520,7 +520,7 @@ namespace osu.Framework.Graphics.Sprites
 
             screenSpaceCharactersBacking.Clear();
 
-            Vector2 inflationAmount = DrawInfo.MatrixInverse.ExtractScale().Xy;
+            Vector2 inflationAmount = DrawInfo.MatrixInverse.XY();
 
             foreach (var character in characters)
             {

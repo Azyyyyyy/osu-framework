@@ -2,19 +2,58 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using osu.Framework.Graphics.Primitives;
-using osuTK;
+using Silk.NET.Maths;
 
 namespace osu.Framework.Graphics
 {
     public static class Vector2Extensions
     {
+        /// <summary>
+        /// Transforms a vector by the given matrix.
+        /// </summary>
+        /// <param name="position">The source vector.</param>
+        /// <param name="matrix">The transformation matrix.</param>
+        /// <returns>The transformed vector.</returns>
+        public static Vector2 Transform(Vector2 position, Matrix3X2<float> matrix)
+        {
+            return new Vector2(
+                position.X * matrix.M11 + position.Y * matrix.M21 + matrix.M31,
+                position.X * matrix.M12 + position.Y * matrix.M22 + matrix.M32);
+        }
+
+        /// <summary>
+        /// Returns a vector created from the largest of the corresponding components of the given vectors.
+        /// </summary>
+        /// <param name="a">First operand</param>
+        /// <param name="b">Second operand</param>
+        /// <returns>The component-wise maximum</returns>
+        public static Vector2 ComponentMax(Vector2 a, Vector2 b)
+        {
+            a.X = a.X > b.X ? a.X : b.X;
+            a.Y = a.Y > b.Y ? a.Y : b.Y;
+            return a;
+        }
+
+        /// <summary>
+        /// Returns a vector created from the largest of the corresponding components of the given vectors.
+        /// </summary>
+        /// <param name="a">First operand</param>
+        /// <param name="b">Second operand</param>
+        /// <param name="result">The component-wise maximum</param>
+        public static void ComponentMax(ref Vector2 a, ref Vector2 b, out Vector2 result)
+        {
+            result.X = a.X > b.X ? a.X : b.X;
+            result.Y = a.Y > b.Y ? a.Y : b.Y;
+        }
+
         /// <summary>Transform a Position by the given Matrix</summary>
         /// <param name="pos">The position to transform</param>
         /// <param name="mat">The desired transformation</param>
         /// <returns>The transformed position</returns>
-        public static Vector2 Transform(Vector2 pos, Matrix3 mat)
+        public static Vector2 Transform(Vector2 pos, Matrix3X3<float> mat)
         {
             Transform(ref pos, ref mat, out Vector2 result);
             return result;
@@ -24,10 +63,10 @@ namespace osu.Framework.Graphics
         /// <param name="pos">The position to transform</param>
         /// <param name="mat">The desired transformation</param>
         /// <param name="result">The transformed vector</param>
-        public static void Transform(ref Vector2 pos, ref Matrix3 mat, out Vector2 result)
+        public static void Transform(ref Vector2 pos, ref Matrix3X3<float> mat, out Vector2 result)
         {
-            result.X = mat.Row0.X * pos.X + mat.Row1.X * pos.Y + mat.Row2.X;
-            result.Y = mat.Row0.Y * pos.X + mat.Row1.Y * pos.Y + mat.Row2.Y;
+            result.X = mat.Row1.X * pos.X + mat.Row2.X * pos.Y + mat.Row3.X;
+            result.Y = mat.Row1.Y * pos.X + mat.Row2.Y * pos.Y + mat.Row3.Y;
         }
 
         /// <summary>

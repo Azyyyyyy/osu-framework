@@ -6,7 +6,7 @@ using System.Linq;
 using osu.Framework.Graphics;
 using osu.Framework.Input.Events;
 using osu.Framework.Input.States;
-using osuTK.Input;
+using Silk.NET.Input;
 
 namespace osu.Framework.Input
 {

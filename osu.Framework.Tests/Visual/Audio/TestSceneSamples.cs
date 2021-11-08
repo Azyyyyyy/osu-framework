@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using System.Numerics;
 using osu.Framework.Allocation;
 using osu.Framework.Audio;
 using osu.Framework.Audio.Sample;
@@ -11,8 +12,6 @@ using osu.Framework.Graphics.Audio;
 using osu.Framework.Graphics.Containers;
 using osu.Framework.Graphics.Shapes;
 using osu.Framework.Input.Events;
-using osuTK;
-using osuTK.Graphics;
 
 namespace osu.Framework.Tests.Visual.Audio
 {
@@ -39,7 +38,7 @@ namespace osu.Framework.Tests.Visual.Audio
                     {
                         new Box
                         {
-                            Colour = Color4.Blue,
+                            Colour = Colour4.Blue,
                             RelativeSizeAxes = Axes.Both,
                         },
                         new Grid(beats - 1, notes),
@@ -97,7 +96,7 @@ namespace osu.Framework.Tests.Visual.Audio
                 RelativePositionAxes = Axes.Both;
                 RelativeSizeAxes = Axes.Y;
                 Size = new Vector2(4, notes);
-                Colour = Color4.SkyBlue;
+                Colour = Colour4.SkyBlue;
 
                 Blending = BlendingParameters.Additive;
 
@@ -105,7 +104,7 @@ namespace osu.Framework.Tests.Visual.Audio
                 {
                     new Box
                     {
-                        Colour = Color4.White,
+                        Colour = Colour4.White,
                         RelativeSizeAxes = Axes.Both,
                     },
                 };
@@ -125,7 +124,7 @@ namespace osu.Framework.Tests.Visual.Audio
                         RelativePositionAxes = Axes.Both,
                         RelativeSizeAxes = Axes.Y,
                         Width = 1,
-                        Colour = Color4.White,
+                        Colour = Colour4.White,
                         X = (float)i / beats
                     });
                 }
@@ -137,7 +136,7 @@ namespace osu.Framework.Tests.Visual.Audio
                         RelativePositionAxes = Axes.Both,
                         RelativeSizeAxes = Axes.X,
                         Height = 1,
-                        Colour = Color4.White,
+                        Colour = Colour4.White,
                         Y = (float)i / notes
                     });
                 }
@@ -159,7 +158,7 @@ namespace osu.Framework.Tests.Visual.Audio
                 {
                     circle = new Circle
                     {
-                        Colour = Color4.Yellow,
+                        Colour = Colour4.Yellow,
                         RelativeSizeAxes = Axes.Both,
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,

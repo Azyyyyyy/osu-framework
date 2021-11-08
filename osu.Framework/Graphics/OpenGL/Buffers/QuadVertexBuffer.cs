@@ -5,7 +5,7 @@ using System;
 using System.Diagnostics;
 using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.OpenGL.Vertices;
-using osuTK.Graphics.ES30;
+using Silk.NET.OpenGL;
 
 namespace osu.Framework.Graphics.OpenGL.Buffers
 {
@@ -13,10 +13,10 @@ namespace osu.Framework.Graphics.OpenGL.Buffers
     {
         static QuadIndexData()
         {
-            GL.GenBuffers(1, out EBO_ID);
+            GLWrapper.GL.GenBuffers(1, out EBO_ID);
         }
 
-        public static readonly int EBO_ID;
+        public static readonly uint EBO_ID;
         public static int MaxAmountIndices;
     }
 
@@ -32,14 +32,14 @@ namespace osu.Framework.Graphics.OpenGL.Buffers
         /// </summary>
         public const int MAX_QUADS = ushort.MaxValue / indices_per_quad;
 
-        internal QuadVertexBuffer(int amountQuads, BufferUsageHint usage)
+        internal QuadVertexBuffer(int amountQuads, BufferUsageARB usage)
             : base(amountQuads * TextureGLSingle.VERTICES_PER_QUAD, usage)
         {
             amountIndices = amountQuads * indices_per_quad;
             Debug.Assert(amountIndices <= ushort.MaxValue);
         }
 
-        protected override void Initialise()
+        protected override unsafe void Initialise()
         {
             base.Initialise();
 
@@ -57,8 +57,8 @@ namespace osu.Framework.Graphics.OpenGL.Buffers
                     indices[j + 5] = (ushort)(i + 1);
                 }
 
-                GLWrapper.BindBuffer(BufferTarget.ElementArrayBuffer, QuadIndexData.EBO_ID);
-                GL.BufferData(BufferTarget.ElementArrayBuffer, (IntPtr)(amountIndices * sizeof(ushort)), indices, BufferUsageHint.StaticDraw);
+                GLWrapper.BindBuffer(BufferTargetARB.ElementArrayBuffer, QuadIndexData.EBO_ID);
+                GLWrapper.GL.BufferData(BufferTargetARB.ElementArrayBuffer, (nuint)(amountIndices * sizeof(ushort)), indices.AsSpan().GetPinnableReference(), BufferUsageARB.StaticDraw);
 
                 QuadIndexData.MaxAmountIndices = amountIndices;
             }
@@ -69,7 +69,7 @@ namespace osu.Framework.Graphics.OpenGL.Buffers
             base.Bind(forRendering);
 
             if (forRendering)
-                GLWrapper.BindBuffer(BufferTarget.ElementArrayBuffer, QuadIndexData.EBO_ID);
+                GLWrapper.BindBuffer(BufferTargetARB.ElementArrayBuffer, QuadIndexData.EBO_ID);
         }
 
         protected override int ToElements(int vertices) => 3 * vertices / 2;

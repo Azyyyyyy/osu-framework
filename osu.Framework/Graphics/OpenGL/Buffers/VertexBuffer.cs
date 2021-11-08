@@ -3,10 +3,11 @@
 
 using System;
 using System.Buffers;
+using System.Runtime.CompilerServices;
 using osu.Framework.Graphics.OpenGL.Vertices;
-using osuTK.Graphics.ES30;
 using osu.Framework.Statistics;
 using osu.Framework.Development;
+using Silk.NET.OpenGL;
 using SixLabors.ImageSharp.Memory;
 
 namespace osu.Framework.Graphics.OpenGL.Buffers
@@ -16,14 +17,14 @@ namespace osu.Framework.Graphics.OpenGL.Buffers
     {
         protected static readonly int STRIDE = VertexUtils<DepthWrappingVertex<T>>.STRIDE;
 
-        private readonly BufferUsageHint usage;
+        private readonly BufferUsageARB usage;
 
         private Memory<DepthWrappingVertex<T>> vertexMemory;
         private IMemoryOwner<DepthWrappingVertex<T>> memoryOwner;
 
-        private int vboId = -1;
+        private uint vboId = 0;
 
-        protected VertexBuffer(int amountVertices, BufferUsageHint usage)
+        protected VertexBuffer(int amountVertices, BufferUsageARB usage)
         {
             this.usage = usage;
 
@@ -60,14 +61,14 @@ namespace osu.Framework.Graphics.OpenGL.Buffers
         {
             ThreadSafety.EnsureDrawThread();
 
-            GL.GenBuffers(1, out vboId);
+            GLWrapper.GL.GenBuffers(1, out vboId);
 
-            if (GLWrapper.BindBuffer(BufferTarget.ArrayBuffer, vboId))
+            if (GLWrapper.BindBuffer(BufferTargetARB.ArrayBuffer, vboId))
                 VertexUtils<DepthWrappingVertex<T>>.Bind();
 
             int size = Size * STRIDE;
 
-            GL.BufferData(BufferTarget.ArrayBuffer, (IntPtr)size, IntPtr.Zero, usage);
+            GLWrapper.GL.BufferData(BufferTargetARB.ArrayBuffer, (uint)size, IntPtr.Zero, usage);
         }
 
         ~VertexBuffer()
@@ -98,10 +99,10 @@ namespace osu.Framework.Graphics.OpenGL.Buffers
             if (IsDisposed)
                 throw new ObjectDisposedException(ToString(), "Can not bind disposed vertex buffers.");
 
-            if (vboId == -1)
+            if (vboId == 0)
                 Initialise();
 
-            if (GLWrapper.BindBuffer(BufferTarget.ArrayBuffer, vboId))
+            if (GLWrapper.BindBuffer(BufferTargetARB.ArrayBuffer, vboId))
                 VertexUtils<DepthWrappingVertex<T>>.Bind();
         }
 
@@ -125,7 +126,7 @@ namespace osu.Framework.Graphics.OpenGL.Buffers
             Bind(true);
 
             int countVertices = endIndex - startIndex;
-            GL.DrawElements(Type, ToElements(countVertices), DrawElementsType.UnsignedShort, (IntPtr)(ToElementIndex(startIndex) * sizeof(ushort)));
+            GLWrapper.GL.DrawElements(Type, (uint)ToElements(countVertices), DrawElementsType.UnsignedShort, (uint)(ToElementIndex(startIndex) * sizeof(ushort)));
 
             Unbind();
         }
@@ -135,12 +136,14 @@ namespace osu.Framework.Graphics.OpenGL.Buffers
             UpdateRange(0, Size);
         }
 
-        public void UpdateRange(int startIndex, int endIndex)
+        public unsafe void UpdateRange(int startIndex, int endIndex)
         {
             Bind(false);
 
             int countVertices = endIndex - startIndex;
-            GL.BufferSubData(BufferTarget.ArrayBuffer, (IntPtr)(startIndex * STRIDE), (IntPtr)(countVertices * STRIDE), ref getMemory().Span[startIndex]);
+            var item = getMemory().Span[startIndex..].GetPinnableReference();
+            //TODO: This sometimes makes the application crash, don't know why yet
+            GLWrapper.GL.BufferSubData(BufferTargetARB.ArrayBuffer, startIndex * STRIDE, (nuint)(countVertices * STRIDE), Unsafe.AsPointer(ref item));
 
             Unbind();
 
@@ -170,12 +173,12 @@ namespace osu.Framework.Graphics.OpenGL.Buffers
 
         void IVertexBuffer.Free()
         {
-            if (vboId != -1)
+            if (vboId != 0)
             {
                 Unbind();
 
-                GL.DeleteBuffer(vboId);
-                vboId = -1;
+                GLWrapper.GL.DeleteBuffer(vboId);
+                vboId = 0;
             }
 
             memoryOwner?.Dispose();

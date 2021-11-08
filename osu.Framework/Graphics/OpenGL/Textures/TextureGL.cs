@@ -2,13 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Numerics;
 using osu.Framework.Graphics.Batches;
 using osu.Framework.Graphics.Primitives;
-using osuTK.Graphics.ES30;
-using osuTK;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.OpenGL.Vertices;
 using osu.Framework.Graphics.Textures;
+using Silk.NET.OpenGL;
 
 namespace osu.Framework.Graphics.OpenGL.Textures
 {
@@ -69,7 +69,7 @@ namespace osu.Framework.Graphics.OpenGL.Textures
 
         public Opacity Opacity { get; protected set; } = Opacity.Mixed;
 
-        public abstract int TextureId { get; }
+        public abstract uint TextureId { get; }
 
         public abstract int Height { get; set; }
 

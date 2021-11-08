@@ -3,10 +3,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Numerics;
 using osu.Framework.Caching;
+using osu.Framework.Graphics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Sprites;
-using osuTK;
 
 namespace osu.Framework.Text
 {
@@ -187,7 +188,7 @@ namespace osu.Framework.Text
             currentLineHeight = Math.Max(currentLineHeight, getGlyphHeight(ref glyph));
             currentNewLine = false;
 
-            Bounds = Vector2.ComponentMax(Bounds, currentPos + new Vector2(0, currentLineHeight));
+            Bounds = Vector2Extensions.ComponentMax(Bounds, currentPos + new Vector2(0, currentLineHeight));
             return true;
         }
 
@@ -297,7 +298,7 @@ namespace osu.Framework.Text
             for (int i = 0; i < Characters.Count; i++)
             {
                 // As above, the bounds are calculated through the character draw rectangles
-                Bounds = Vector2.ComponentMax(
+                Bounds = Vector2Extensions.ComponentMax(
                     Bounds,
                     new Vector2(
                         Characters[i].DrawRectangle.Left - Characters[i].XOffset + Characters[i].XAdvance,

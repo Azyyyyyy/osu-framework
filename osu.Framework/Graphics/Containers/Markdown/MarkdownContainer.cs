@@ -3,6 +3,7 @@
 
 using System;
 using System.Linq;
+using System.Numerics;
 using Markdig;
 using Markdig.Extensions.AutoIdentifiers;
 using Markdig.Extensions.Tables;
@@ -13,7 +14,6 @@ using osu.Framework.Caching;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Utils;
-using osuTK;
 
 namespace osu.Framework.Graphics.Containers.Markdown
 {

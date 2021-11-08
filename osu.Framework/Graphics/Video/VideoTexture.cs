@@ -3,17 +3,17 @@
 
 using System;
 using System.Diagnostics;
-using osuTK.Graphics.ES30;
 using osu.Framework.Graphics.OpenGL;
 using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Platform;
+using Silk.NET.OpenGL;
 
 namespace osu.Framework.Graphics.Video
 {
     internal unsafe class VideoTexture : TextureGLSingle
     {
-        private int[] textureIds;
+        private uint[] textureIds;
 
         /// <summary>
         /// Whether the latest frame data has been uploaded.
@@ -21,7 +21,7 @@ namespace osu.Framework.Graphics.Video
         public bool UploadComplete { get; private set; }
 
         public VideoTexture(int width, int height, WrapMode wrapModeS = WrapMode.None, WrapMode wrapModeT = WrapMode.None)
-            : base(width, height, true, All.Linear, wrapModeS, wrapModeT)
+            : base(width, height, true, GLEnum.Linear, wrapModeS, wrapModeT)
         {
         }
 
@@ -40,7 +40,7 @@ namespace osu.Framework.Graphics.Video
             base.SetData(upload, wrapModeS, wrapModeT, Opacity = Opacity.Opaque);
         }
 
-        public override int TextureId => textureIds?[0] ?? 0;
+        public override uint TextureId => textureIds?[0] ?? 0;
 
         private int textureSize;
 
@@ -67,7 +67,7 @@ namespace osu.Framework.Graphics.Video
             return true;
         }
 
-        protected override void DoUpload(ITextureUpload upload, IntPtr dataPointer)
+        protected override void DoUpload(ITextureUpload upload, void* dataPointer)
         {
             if (!(upload is VideoTextureUpload videoUpload))
                 return;
@@ -78,8 +78,8 @@ namespace osu.Framework.Graphics.Video
                 Debug.Assert(memoryLease == null);
                 memoryLease = NativeMemoryTracker.AddMemory(this, Width * Height * 3 / 2);
 
-                textureIds = new int[3];
-                GL.GenTextures(textureIds.Length, textureIds);
+                textureIds = new uint[3];
+                GLWrapper.GL.GenTextures((uint)textureIds.Length, textureIds);
 
                 for (int i = 0; i < textureIds.Length; i++)
                 {
@@ -90,7 +90,7 @@ namespace osu.Framework.Graphics.Video
                         int width = videoUpload.Frame->width;
                         int height = videoUpload.Frame->height;
 
-                        GL.TexImage2D(TextureTarget2d.Texture2D, 0, TextureComponentCount.R8, width, height, 0, PixelFormat.Red, PixelType.UnsignedByte, IntPtr.Zero);
+                        GLWrapper.GL.TexImage2D(TextureTarget.Texture2D, 0, InternalFormat.R8, (uint)width, (uint)height, 0, PixelFormat.Red, PixelType.UnsignedByte, IntPtr.Zero);
 
                         textureSize += width * height;
                     }
@@ -99,16 +99,16 @@ namespace osu.Framework.Graphics.Video
                         int width = (videoUpload.Frame->width + 1) / 2;
                         int height = (videoUpload.Frame->height + 1) / 2;
 
-                        GL.TexImage2D(TextureTarget2d.Texture2D, 0, TextureComponentCount.R8, width, height, 0, PixelFormat.Red, PixelType.UnsignedByte, IntPtr.Zero);
+                        GLWrapper.GL.TexImage2D(TextureTarget.Texture2D, 0, InternalFormat.R8, (uint)width, (uint)height, 0, PixelFormat.Red, PixelType.UnsignedByte, IntPtr.Zero);
 
                         textureSize += width * height;
                     }
 
-                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.Linear);
-                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Linear);
+                    GLWrapper.GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)GLEnum.Linear);
+                    GLWrapper.GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)GLEnum.Linear);
 
-                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
-                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
+                    GLWrapper.GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.ClampToEdge);
+                    GLWrapper.GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.ClampToEdge);
                 }
             }
 
@@ -116,12 +116,12 @@ namespace osu.Framework.Graphics.Video
             {
                 GLWrapper.BindTexture(textureIds[i]);
 
-                GL.PixelStore(PixelStoreParameter.UnpackRowLength, videoUpload.Frame->linesize[(uint)i]);
-                GL.TexSubImage2D(TextureTarget2d.Texture2D, 0, 0, 0, videoUpload.Frame->width / (i > 0 ? 2 : 1), videoUpload.Frame->height / (i > 0 ? 2 : 1),
+                GLWrapper.GL.PixelStore(PixelStoreParameter.UnpackRowLength, videoUpload.Frame->linesize[(uint)i]);
+                GLWrapper.GL.TexSubImage2D(TextureTarget.Texture2D, 0, 0, 0, (uint)(videoUpload.Frame->width / (i > 0 ? 2 : 1)), (uint)(videoUpload.Frame->height / (i > 0 ? 2 : 1)),
                     PixelFormat.Red, PixelType.UnsignedByte, (IntPtr)videoUpload.Frame->data[(uint)i]);
             }
 
-            GL.PixelStore(PixelStoreParameter.UnpackRowLength, 0);
+            GLWrapper.GL.PixelStore(PixelStoreParameter.UnpackRowLength, 0);
 
             UploadComplete = true;
         }
@@ -144,8 +144,8 @@ namespace osu.Framework.Graphics.Video
 
             for (int i = 0; i < textureIds.Length; i++)
             {
-                if (textureIds[i] >= 0)
-                    GL.DeleteTextures(1, new[] { textureIds[i] });
+                if (textureIds[i] > 0)
+                    GLWrapper.GL.DeleteTextures(1, new[] { textureIds[i] });
             }
         }
 

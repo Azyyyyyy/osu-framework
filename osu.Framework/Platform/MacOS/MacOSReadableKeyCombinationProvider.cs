@@ -3,7 +3,7 @@
 
 using osu.Framework.Input.Bindings;
 using osu.Framework.Platform.SDL2;
-using SDL2;
+using Silk.NET.SDL;
 
 namespace osu.Framework.Platform.MacOS
 {
@@ -24,23 +24,23 @@ namespace osu.Framework.Platform.MacOS
             }
         }
 
-        protected override bool TryGetNameFromKeycode(SDL.SDL_Keycode keycode, out string name)
+        protected override bool TryGetNameFromKeycode(KeyCode keycode, out string name)
         {
             switch (keycode)
             {
-                case SDL.SDL_Keycode.SDLK_LGUI:
+                case KeyCode.KLgui:
                     name = "LCmd";
                     return true;
 
-                case SDL.SDL_Keycode.SDLK_RGUI:
+                case KeyCode.KRgui:
                     name = "RCmd";
                     return true;
 
-                case SDL.SDL_Keycode.SDLK_LALT:
+                case KeyCode.KLalt:
                     name = "LOpt";
                     return true;
 
-                case SDL.SDL_Keycode.SDLK_RALT:
+                case KeyCode.KRalt:
                     name = "ROpt";
                     return true;
 

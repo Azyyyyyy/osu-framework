@@ -3,15 +3,14 @@
 
 using System;
 using osu.Framework.Graphics.Primitives;
-using osu.Framework.Graphics.Textures;
-using osuTK;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Allocation;
 using System.Collections.Generic;
+using System.Numerics;
 using osu.Framework.Caching;
 using osu.Framework.Extensions.EnumExtensions;
-using osuTK.Graphics;
-using osuTK.Graphics.ES30;
+using Silk.NET.OpenGL;
+using Texture = osu.Framework.Graphics.Textures.Texture;
 
 namespace osu.Framework.Graphics.Lines
 {
@@ -275,11 +274,11 @@ namespace osu.Framework.Graphics.Lines
         public Vector2 FrameBufferScale { get; } = Vector2.One;
 
         // The path should not receive the true colour to avoid colour doubling when the frame-buffer is rendered to the back-buffer.
-        public override DrawColourInfo DrawColourInfo => new DrawColourInfo(Color4.White, base.DrawColourInfo.Blending);
+        public override DrawColourInfo DrawColourInfo => new DrawColourInfo(Colour4.White, base.DrawColourInfo.Blending);
 
-        public Color4 BackgroundColour => new Color4(0, 0, 0, 0);
+        public Colour4 BackgroundColour => new Colour4(0, 0, 0, 0);
 
-        private readonly BufferedDrawNodeSharedData sharedData = new BufferedDrawNodeSharedData(new[] { RenderbufferInternalFormat.DepthComponent16 }, clipToRootNode: true);
+        private readonly BufferedDrawNodeSharedData sharedData = new BufferedDrawNodeSharedData(new[] { InternalFormat.DepthComponent16 }, clipToRootNode: true);
 
         protected override DrawNode CreateDrawNode() => new BufferedDrawNode(this, new PathDrawNode(this), sharedData);
 

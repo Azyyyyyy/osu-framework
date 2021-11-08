@@ -4,8 +4,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using osu.Framework.Graphics.Primitives;
-using osuTK;
 
 namespace osu.Framework.Utils
 {
@@ -326,9 +326,9 @@ namespace osu.Framework.Utils
 
             // See: https://en.wikipedia.org/wiki/Circumscribed_circle#Cartesian_coordinates_2
             float d = 2 * (a.X * (b - c).Y + b.X * (c - a).Y + c.X * (a - b).Y);
-            float aSq = a.LengthSquared;
-            float bSq = b.LengthSquared;
-            float cSq = c.LengthSquared;
+            float aSq = a.LengthSquared();
+            float bSq = b.LengthSquared();
+            float cSq = c.LengthSquared();
 
             Vector2 centre = new Vector2(
                 aSq * (b - c).Y + bSq * (c - a).Y + cSq * (a - b).Y,
@@ -337,7 +337,7 @@ namespace osu.Framework.Utils
             Vector2 dA = a - centre;
             Vector2 dC = c - centre;
 
-            float r = dA.Length;
+            float r = dA.Length();
 
             double thetaStart = Math.Atan2(dA.Y, dA.X);
             double thetaEnd = Math.Atan2(dC.Y, dC.X);
@@ -374,7 +374,7 @@ namespace osu.Framework.Utils
         {
             for (int i = 1; i < controlPoints.Length - 1; i++)
             {
-                if ((controlPoints[i - 1] - 2 * controlPoints[i] + controlPoints[i + 1]).LengthSquared > bezier_tolerance * bezier_tolerance * 4)
+                if ((controlPoints[i - 1] - 2 * controlPoints[i] + controlPoints[i + 1]).LengthSquared() > bezier_tolerance * bezier_tolerance * 4)
                     return false;
             }
 

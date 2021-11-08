@@ -38,10 +38,11 @@ namespace osu.Framework
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 OS = Platform.Windows;
-            if (osuTK.Configuration.RunningOnIOS)
-                OS = OS == 0 ? Platform.iOS : throw new InvalidOperationException($"Tried to set OS Platform to {nameof(Platform.iOS)}, but is already {Enum.GetName(typeof(Platform), OS)}");
-            if (osuTK.Configuration.RunningOnAndroid)
-                OS = OS == 0 ? Platform.Android : throw new InvalidOperationException($"Tried to set OS Platform to {nameof(Platform.Android)}, but is already {Enum.GetName(typeof(Platform), OS)}");
+            //TODO: Readd this
+            //if (osuTK.Configuration.RunningOnIOS)
+            //    OS = OS == 0 ? Platform.iOS : throw new InvalidOperationException($"Tried to set OS Platform to {nameof(Platform.iOS)}, but is already {Enum.GetName(typeof(Platform), OS)}");
+            //if (osuTK.Configuration.RunningOnAndroid)
+            //    OS = OS == 0 ? Platform.Android : throw new InvalidOperationException($"Tried to set OS Platform to {nameof(Platform.Android)}, but is already {Enum.GetName(typeof(Platform), OS)}");
             if (OS != Platform.iOS && RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                 OS = OS == 0 ? Platform.macOS : throw new InvalidOperationException($"Tried to set OS Platform to {nameof(Platform.macOS)}, but is already {Enum.GetName(typeof(Platform), OS)}");
             if (OS != Platform.Android && RuntimeInformation.IsOSPlatform(OSPlatform.Linux))

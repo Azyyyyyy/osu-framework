@@ -6,9 +6,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Numerics;
 using osu.Framework.Bindables;
 using osu.Framework.Input.Events;
-using osuTK;
 
 namespace osu.Framework.Graphics.Containers
 {

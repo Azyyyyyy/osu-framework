@@ -1,8 +1,6 @@
 // Copyright (c) ppy Pty Ltd <contact@ppy.sh>. Licensed under the MIT Licence.
 // See the LICENCE file in the repository root for full licence text.
 
-using osuTK;
-using osuTK.Graphics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.TypeExtensions;
 using osu.Framework.Graphics.Colour;
@@ -21,6 +19,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Numerics;
 using System.Reflection;
 using System.Threading;
 using JetBrains.Annotations;
@@ -35,7 +34,7 @@ using osu.Framework.Input.States;
 using osu.Framework.Layout;
 using osu.Framework.Testing;
 using osu.Framework.Utils;
-using osuTK.Input;
+using Silk.NET.Input;
 using Container = osu.Framework.Graphics.Containers.Container;
 
 namespace osu.Framework.Graphics
@@ -1262,12 +1261,12 @@ namespace osu.Framework.Graphics
 
         #region Colour / Alpha / Blending
 
-        private ColourInfo colour = Color4.White;
+        private ColourInfo colour = Colour4.White;
 
         /// <summary>
         /// Colour of this <see cref="Drawable"/> in sRGB space. Can contain individual colours for all four
         /// corners of this <see cref="Drawable"/>, which are then interpolated, but can also be assigned
-        /// just a single colour. Implicit casts from <see cref="SRGBColour"/> and from <see cref="Color4"/> exist.
+        /// just a single colour. Implicit casts from <see cref="SRGBColour"/> and from <see cref="Colour4"/> exist.
         /// </summary>
         public ColourInfo Colour
         {
@@ -1687,9 +1686,9 @@ namespace osu.Framework.Graphics
             Vector2 bottomRightSize2 = -bottomRightOffset * ratio2;
 
             // Expand bounds according to clipped offset
-            return Vector2.ComponentMax(
-                Vector2.ComponentMax(topLeftSize1, topLeftSize2),
-                Vector2.ComponentMax(bottomRightSize1, bottomRightSize2));
+            return Vector2Extensions.ComponentMax(
+                Vector2Extensions.ComponentMax(topLeftSize1, topLeftSize2),
+                Vector2Extensions.ComponentMax(bottomRightSize1, bottomRightSize2));
         }
 
         /// <summary>

@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System.Linq;
+using System.Numerics;
 using NUnit.Framework;
 using osu.Framework.Graphics;
 using osu.Framework.Graphics.Containers;
@@ -9,9 +10,7 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Input.Events;
 using osu.Framework.Testing;
-using osuTK;
-using osuTK.Graphics;
-using osuTK.Input;
+using Silk.NET.Input;
 
 namespace osu.Framework.Tests.Visual.Input
 {
@@ -45,10 +44,10 @@ namespace osu.Framework.Tests.Visual.Input
         public void SeparateClicks()
         {
             AddStep("move", () => InputManager.MoveMouseTo(InputManager.Children.First().ScreenSpaceDrawQuad.Centre));
-            AddStep("press 1", () => InputManager.PressButton(MouseButton.Button1));
-            AddStep("press 2", () => InputManager.PressButton(MouseButton.Button2));
-            AddStep("release 1", () => InputManager.ReleaseButton(MouseButton.Button1));
-            AddStep("release 2", () => InputManager.ReleaseButton(MouseButton.Button2));
+            AddStep("press 1", () => InputManager.PressButton(MouseButton.Left));
+            AddStep("press 2", () => InputManager.PressButton(MouseButton.Right));
+            AddStep("release 1", () => InputManager.ReleaseButton(MouseButton.Left));
+            AddStep("release 2", () => InputManager.ReleaseButton(MouseButton.Right));
             AddAssert("box 1 was pressed", () => box1.HitCount == 1);
             AddAssert("box 2 was pressed", () => box2.HitCount == 1);
             AddAssert("box 3 not pressed", () => box3.HitCount == 0);
@@ -60,13 +59,13 @@ namespace osu.Framework.Tests.Visual.Input
             AddStep("move", () => InputManager.MoveMouseTo(Children.First().ScreenSpaceDrawQuad.Centre));
             AddStep("press 1+2", () =>
             {
-                InputManager.PressButton(MouseButton.Button1);
-                InputManager.PressButton(MouseButton.Button2);
+                InputManager.PressButton(MouseButton.Left);
+                InputManager.PressButton(MouseButton.Right);
             });
             AddStep("release 1+2", () =>
             {
-                InputManager.ReleaseButton(MouseButton.Button1);
-                InputManager.ReleaseButton(MouseButton.Button2);
+                InputManager.ReleaseButton(MouseButton.Left);
+                InputManager.ReleaseButton(MouseButton.Right);
             });
             AddAssert("box 1 was pressed", () => box1.HitCount == 1);
             AddAssert("box 2 was pressed", () => box2.HitCount == 1);
@@ -89,7 +88,7 @@ namespace osu.Framework.Tests.Visual.Input
                 Anchor = Anchor.Centre;
                 Origin = Anchor.Centre;
 
-                BorderColour = Color4.BlueViolet;
+                BorderColour = Colour4.BlueViolet;
                 BorderThickness = 3;
                 Masking = true;
 
@@ -98,7 +97,7 @@ namespace osu.Framework.Tests.Visual.Input
                     new Box { RelativeSizeAxes = Axes.Both },
                     new SpriteText
                     {
-                        Colour = Color4.Black,
+                        Colour = Colour4.Black,
                         Text = index.ToString(),
                         Anchor = Anchor.Centre,
                         Origin = Anchor.Centre,

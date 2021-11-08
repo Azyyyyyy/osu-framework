@@ -5,11 +5,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using osu.Framework.Graphics.OpenGL;
 using osu.Framework.Input;
 using osu.Framework.Input.Bindings;
 using osu.Framework.Input.Handlers;
 using osu.Framework.Input.Handlers.Mouse;
-using osuTK.Graphics.OpenGL;
 
 namespace osu.Framework.Platform.MacOS
 {
@@ -50,7 +50,7 @@ namespace osu.Framework.Platform.MacOS
 
             // It has been reported that this helps performance on macOS (https://github.com/ppy/osu/issues/7447)
             if (!Window.VerticalSync)
-                GL.Finish();
+                GLWrapper.GL.Finish();
         }
 
         protected override IEnumerable<InputHandler> CreateAvailableInputHandlers()

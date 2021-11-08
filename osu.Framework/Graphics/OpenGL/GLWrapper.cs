@@ -5,26 +5,29 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using System.Numerics;
 using osu.Framework.Development;
 using osu.Framework.Graphics.Batches;
 using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Threading;
-using osuTK;
-using osuTK.Graphics;
-using osuTK.Graphics.ES30;
 using osu.Framework.Statistics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.OpenGL.Buffers;
 using osu.Framework.Platform;
 using osu.Framework.Timing;
+using Silk.NET.Maths;
+using Silk.NET.OpenGL;
 using static osu.Framework.Threading.ScheduledDelegate;
 
 namespace osu.Framework.Graphics.OpenGL
 {
     public static class GLWrapper
     {
+        public static GL GL { get; private set; }
+
         /// <summary>
         /// Maximum number of <see cref="DrawNode"/>s a <see cref="Drawable"/> can draw with.
         /// This is a carefully-chosen number to enable the update and draw threads to work concurrently without causing unnecessary load.
@@ -49,21 +52,21 @@ namespace osu.Framework.Graphics.OpenGL
         public static RectangleF Ortho { get; private set; }
         public static RectangleI Scissor { get; private set; }
         public static Vector2I ScissorOffset { get; private set; }
-        public static Matrix4 ProjectionMatrix { get; set; }
+        public static Matrix4X4<float> ProjectionMatrix { get; set; }
         public static DepthInfo CurrentDepthInfo { get; private set; }
 
         public static float BackbufferDrawDepth { get; private set; }
 
         public static bool UsingBackbuffer => frame_buffer_stack.Peek() == DefaultFrameBuffer;
 
-        public static int DefaultFrameBuffer;
+        public static uint DefaultFrameBuffer;
 
         public static bool IsEmbedded { get; internal set; }
 
         /// <summary>
         /// Check whether we have an initialised and non-disposed GL context.
         /// </summary>
-        public static bool HasContext => GraphicsContext.CurrentContext != null;
+        public static bool HasContext => GL?.Context != null;
 
         public static int MaxTextureSize { get; private set; } = 4096; // default value is to allow roughly normal flow in cases we don't have a GL context, like headless CI.
         public static int MaxRenderBufferSize { get; private set; } = 4096; // default value is to allow roughly normal flow in cases we don't have a GL context, like headless CI.
@@ -97,17 +100,24 @@ namespace osu.Framework.Graphics.OpenGL
 
         private static WeakReference<GameHost> host;
 
+        internal static void SetGL(GL gl)
+        {
+            if (IsInitialized)
+            {
+                return;
+            }
+
+            GL = gl;
+        }
+
         internal static void Initialize(GameHost host)
         {
             if (IsInitialized) return;
 
-            if (host.Window is OsuTKWindow win)
-                IsEmbedded = win.IsEmbedded;
-
             GLWrapper.host = new WeakReference<GameHost>(host);
 
-            MaxTextureSize = GL.GetInteger(GetPName.MaxTextureSize);
-            MaxRenderBufferSize = GL.GetInteger(GetPName.MaxRenderbufferSize);
+            MaxTextureSize = GL.GetInteger(GLEnum.MaxTextureSize);
+            MaxRenderBufferSize = GL.GetInteger(GLEnum.MaxRenderbufferSize);
 
             GL.Disable(EnableCap.StencilTest);
             GL.Enable(EnableCap.Blend);
@@ -188,14 +198,14 @@ namespace osu.Framework.Graphics.OpenGL
             {
                 ScreenSpaceAABB = new RectangleI(0, 0, (int)size.X, (int)size.Y),
                 MaskingRect = new RectangleF(0, 0, size.X, size.Y),
-                ToMaskingSpace = Matrix3.Identity,
+                ToMaskingSpace = Matrix3X3<float>.Identity,
                 BlendRange = 1,
                 AlphaExponent = 1,
                 CornerExponent = 2.5f,
             }, true);
 
             PushDepthInfo(DepthInfo.Default);
-            Clear(new ClearInfo(Color4.Black));
+            Clear(new ClearInfo(Colour4.Black));
 
             freeUnusedVertexBuffers();
 
@@ -239,7 +249,7 @@ namespace osu.Framework.Graphics.OpenGL
             PushDepthInfo(new DepthInfo(writeDepth: true));
             PushScissorState(false);
             if (clearInfo.Colour != currentClearInfo.Colour)
-                GL.ClearColor(clearInfo.Colour);
+                GL.ClearColor(clearInfo.Colour.R, clearInfo.Colour.G, clearInfo.Colour.B, clearInfo.Colour.A);
 
             if (clearInfo.Depth != currentClearInfo.Depth)
             {
@@ -253,7 +263,7 @@ namespace osu.Framework.Graphics.OpenGL
                 {
                     // Older desktop platforms don't support glClearDepthf, so standard GL's double version is used instead
                     // See: https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glClearDepth.xhtml
-                    osuTK.Graphics.OpenGL.GL.ClearDepth(clearInfo.Depth);
+                    GL.ClearDepth(clearInfo.Depth);
                 }
             }
 
@@ -326,7 +336,7 @@ namespace osu.Framework.Graphics.OpenGL
                 expensive_operation_queue.Enqueue(operation);
         }
 
-        private static readonly int[] last_bound_buffers = new int[2];
+        private static readonly uint[] last_bound_buffers = new uint[2];
 
         /// <summary>
         /// Bind an OpenGL buffer object.
@@ -334,9 +344,9 @@ namespace osu.Framework.Graphics.OpenGL
         /// <param name="target">The buffer type to bind.</param>
         /// <param name="buffer">The buffer ID to bind.</param>
         /// <returns>Whether an actual bind call was necessary. This value is false when repeatedly binding the same buffer.</returns>
-        public static bool BindBuffer(BufferTarget target, int buffer)
+        public static bool BindBuffer(BufferTargetARB target, uint buffer)
         {
-            int bufferIndex = target - BufferTarget.ArrayBuffer;
+            int bufferIndex = target - BufferTargetARB.ArrayBuffer;
             if (last_bound_buffers[bufferIndex] == buffer)
                 return false;
 
@@ -390,7 +400,7 @@ namespace osu.Framework.Graphics.OpenGL
             vertex_buffers_in_use.RemoveAll(b => !b.InUse);
         }
 
-        private static readonly int[] last_bound_texture = new int[16];
+        private static readonly uint[] last_bound_texture = new uint[16];
         private static readonly bool[] last_bound_texture_is_atlas = new bool[16];
 
         internal static int GetTextureUnitId(TextureUnit unit) => (int)unit - (int)TextureUnit.Texture0;
@@ -423,7 +433,7 @@ namespace osu.Framework.Graphics.OpenGL
         /// <param name="wrapModeS">The texture wrap mode in horizontal direction.</param>
         /// <param name="wrapModeT">The texture wrap mode in vertical direction.</param>
         /// <returns>true if the provided texture was not already bound (causing a binding change).</returns>
-        public static bool BindTexture(int textureId, TextureUnit unit = TextureUnit.Texture0, WrapMode wrapModeS = WrapMode.None, WrapMode wrapModeT = WrapMode.None)
+        public static bool BindTexture(uint textureId, TextureUnit unit = TextureUnit.Texture0, WrapMode wrapModeS = WrapMode.None, WrapMode wrapModeT = WrapMode.None)
         {
             int index = GetTextureUnitId(unit);
 
@@ -521,7 +531,7 @@ namespace osu.Framework.Graphics.OpenGL
 
             Viewport = actualRect;
 
-            GL.Viewport(Viewport.Left, Viewport.Top, Viewport.Width, Viewport.Height);
+            GL.Viewport(Viewport.Left, Viewport.Top, (uint)Viewport.Width, (uint)Viewport.Height);
         }
 
         /// <summary>
@@ -541,7 +551,7 @@ namespace osu.Framework.Graphics.OpenGL
 
             Viewport = actualRect;
 
-            GL.Viewport(Viewport.Left, Viewport.Top, Viewport.Width, Viewport.Height);
+            GL.Viewport(Viewport.Left, Viewport.Top, (uint)Viewport.Width, (uint)Viewport.Height);
         }
 
         /// <summary>
@@ -593,7 +603,7 @@ namespace osu.Framework.Graphics.OpenGL
                 scissor.Height = -scissor.Height;
             }
 
-            GL.Scissor(scissor.X, Viewport.Height - scissor.Bottom, scissor.Width, scissor.Height);
+            GL.Scissor(scissor.X, Viewport.Height - scissor.Bottom, (uint)scissor.Width, (uint)scissor.Height);
         }
 
         private static readonly Stack<Vector2I> scissor_offset_stack = new Stack<Vector2I>();
@@ -647,7 +657,7 @@ namespace osu.Framework.Graphics.OpenGL
 
             Ortho = ortho;
 
-            ProjectionMatrix = Matrix4.CreateOrthographicOffCenter(Ortho.Left, Ortho.Right, Ortho.Bottom, Ortho.Top, -1, 1);
+            ProjectionMatrix = Matrix4X4.CreateOrthographicOffCenter(Ortho.Left, Ortho.Right, Ortho.Bottom, Ortho.Top, -1, 1);
             GlobalPropertyManager.Set(GlobalProperty.ProjMatrix, ProjectionMatrix);
         }
 
@@ -668,13 +678,13 @@ namespace osu.Framework.Graphics.OpenGL
 
             Ortho = actualRect;
 
-            ProjectionMatrix = Matrix4.CreateOrthographicOffCenter(Ortho.Left, Ortho.Right, Ortho.Bottom, Ortho.Top, -1, 1);
+            ProjectionMatrix = Matrix4X4.CreateOrthographicOffCenter(Ortho.Left, Ortho.Right, Ortho.Bottom, Ortho.Top, -1, 1);
             GlobalPropertyManager.Set(GlobalProperty.ProjMatrix, ProjectionMatrix);
         }
 
         private static readonly Stack<MaskingInfo> masking_stack = new Stack<MaskingInfo>();
         private static readonly Stack<RectangleI> scissor_rect_stack = new Stack<RectangleI>();
-        private static readonly Stack<int> frame_buffer_stack = new Stack<int>();
+        private static readonly Stack<uint> frame_buffer_stack = new Stack<uint>();
         private static readonly Stack<DepthInfo> depth_stack = new Stack<DepthInfo>();
 
         private static void setMaskingInfo(MaskingInfo maskingInfo, bool isPushing, bool overwritePreviousScissor)
@@ -829,9 +839,9 @@ namespace osu.Framework.Graphics.OpenGL
         /// Binds a framebuffer.
         /// </summary>
         /// <param name="frameBuffer">The framebuffer to bind.</param>
-        public static void BindFrameBuffer(int frameBuffer)
+        public static void BindFrameBuffer(uint frameBuffer)
         {
-            if (frameBuffer == -1) return;
+            if (frameBuffer == 0) return;
 
             bool alreadyBound = frame_buffer_stack.Count > 0 && frame_buffer_stack.Peek() == frameBuffer;
 
@@ -852,41 +862,41 @@ namespace osu.Framework.Graphics.OpenGL
         /// Binds a framebuffer.
         /// </summary>
         /// <param name="frameBuffer">The framebuffer to bind.</param>
-        public static void UnbindFrameBuffer(int frameBuffer)
+        public static void UnbindFrameBuffer(uint frameBuffer)
         {
-            if (frameBuffer == -1) return;
+            if (frameBuffer == 0) return;
 
             if (frame_buffer_stack.Peek() != frameBuffer)
                 return;
 
-            frame_buffer_stack.Pop();
-
             FlushCurrentBatch();
-            GL.BindFramebuffer(FramebufferTarget.Framebuffer, frame_buffer_stack.Peek());
+            GL.BindFramebuffer(FramebufferTarget.Framebuffer, frameBuffer);
 
             GlobalPropertyManager.Set(GlobalProperty.BackbufferDraw, UsingBackbuffer);
             GlobalPropertyManager.Set(GlobalProperty.GammaCorrection, UsingBackbuffer);
+
+            frame_buffer_stack.Pop();
         }
 
         /// <summary>
         /// Deletes a frame buffer.
         /// </summary>
         /// <param name="frameBuffer">The frame buffer to delete.</param>
-        internal static void DeleteFrameBuffer(int frameBuffer)
+        internal static void DeleteFrameBuffer(uint frameBuffer)
         {
-            if (frameBuffer == -1) return;
+            if (frameBuffer == 0) return;
 
-            while (frame_buffer_stack.Peek() == frameBuffer)
+            while (frame_buffer_stack.Any() && frame_buffer_stack.Peek() == frameBuffer)
                 UnbindFrameBuffer(frameBuffer);
 
             ScheduleDisposal(() => { GL.DeleteFramebuffer(frameBuffer); });
         }
 
-        private static int currentShader;
+        private static uint currentShader;
 
-        private static readonly Stack<int> shader_stack = new Stack<int>();
+        private static readonly Stack<uint> shader_stack = new Stack<uint>();
 
-        public static void UseProgram(int? shader)
+        public static void UseProgram(uint? shader)
         {
             ThreadSafety.EnsureDrawThread();
 
@@ -903,7 +913,7 @@ namespace osu.Framework.Graphics.OpenGL
                     return;
             }
 
-            int s = shader ?? shader_stack.Peek();
+            uint s = shader ?? shader_stack.Peek();
 
             if (currentShader == s) return;
 
@@ -947,16 +957,19 @@ namespace osu.Framework.Graphics.OpenGL
                     GL.Uniform4(uniform.Location, ref v4.GetValueByRef());
                     break;
 
-                case IUniformWithValue<Matrix2> m2:
-                    GL.UniformMatrix2(uniform.Location, false, ref m2.GetValueByRef());
+                case IUniformWithValue<Matrix2X2<float>> m2:
+                    var m2R = m2.GetValueByRef();
+                    GL.UniformMatrix2(uniform.Location, false, new [] { m2R.Column1.Length, m2R.Column2.Length });
                     break;
 
-                case IUniformWithValue<Matrix3> m3:
-                    GL.UniformMatrix3(uniform.Location, false, ref m3.GetValueByRef());
+                case IUniformWithValue<Matrix3X3<float>> m3:
+                    var m3R = m3.GetValueByRef();
+                    GL.UniformMatrix3(uniform.Location, false, new [] { m3R.Column1.Length, m3R.Column2.Length, m3R.Column3.Length });
                     break;
 
-                case IUniformWithValue<Matrix4> m4:
-                    GL.UniformMatrix4(uniform.Location, false, ref m4.GetValueByRef());
+                case IUniformWithValue<Matrix4X4<float>> m4:
+                    var m4R = m4.GetValueByRef();
+                    GL.UniformMatrix4(uniform.Location, false, new [] { m4R.Column1.Length, m4R.Column2.Length, m4R.Column3.Length, m4R.Column4.Length });
                     break;
             }
         }
@@ -974,7 +987,7 @@ namespace osu.Framework.Graphics.OpenGL
         /// space of the container doing the masking).
         /// It is used by a shader to determine which pixels to discard.
         /// </summary>
-        public Matrix3 ToMaskingSpace;
+        public Matrix3X3<float> ToMaskingSpace;
 
         public float CornerRadius;
         public float CornerExponent;

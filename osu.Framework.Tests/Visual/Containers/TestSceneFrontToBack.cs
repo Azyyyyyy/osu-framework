@@ -2,6 +2,7 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Numerics;
 using osu.Framework.Allocation;
 using osu.Framework.Configuration;
 using osu.Framework.Graphics;
@@ -12,12 +13,11 @@ using osu.Framework.Graphics.Shapes;
 using osu.Framework.Graphics.Sprites;
 using osu.Framework.Utils;
 using osu.Framework.Testing;
-using osuTK;
-using osuTK.Graphics;
-using osuTK.Graphics.ES30;
 using osu.Framework.Graphics.Textures;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.OpenGL.Textures;
+using Silk.NET.OpenGL;
+using Texture = osu.Framework.Graphics.Textures.Texture;
 
 namespace osu.Framework.Tests.Visual.Containers
 {
@@ -69,7 +69,7 @@ namespace osu.Framework.Tests.Visual.Containers
                 {
                     new Box
                     {
-                        Colour = Color4.Black,
+                        Colour = Colour4.Black,
                         RelativeSizeAxes = Axes.Both,
                         Alpha = 0.8f,
                     },
@@ -109,7 +109,7 @@ namespace osu.Framework.Tests.Visual.Containers
                 {
                     Anchor = Anchor.Centre,
                     Origin = Anchor.Centre,
-                    Colour = new Color4(RNG.NextSingle(1), RNG.NextSingle(1), RNG.NextSingle(1), 1),
+                    Colour = new Colour4(RNG.NextSingle(1), RNG.NextSingle(1), RNG.NextSingle(1), 1),
                     RelativeSizeAxes = Axes.Both,
                     Scale = new Vector2(currentScale),
                     Texture = texture,
@@ -124,7 +124,7 @@ namespace osu.Framework.Tests.Visual.Containers
 
         private class QueryingCompositeDrawableDrawNode : CompositeDrawableDrawNode
         {
-            private int queryObject = -1;
+            private uint queryObject = 0;
 
             public int DrawSamples { get; private set; }
             public int DrawOpaqueInteriorSubTreeSamples { get; private set; }
@@ -157,18 +157,18 @@ namespace osu.Framework.Tests.Visual.Containers
 
             private int endQuery()
             {
-                GL.EndQuery(QueryTarget.SamplesPassed);
-                GL.GetQueryObject(queryObject, GetQueryObjectParam.QueryResult, out int result);
+                GLWrapper.GL.EndQuery(QueryTarget.SamplesPassed);
+                GLWrapper.GL.GetQueryObject(queryObject, GLEnum.QueryResult, out int result);
 
                 return result;
             }
 
             private void startQuery()
             {
-                if (queryObject == -1)
-                    queryObject = GL.GenQuery();
+                if (queryObject == 0)
+                    queryObject = GLWrapper.GL.GenQuery();
 
-                GL.BeginQuery(QueryTarget.SamplesPassed, queryObject);
+                GLWrapper.GL.BeginQuery(QueryTarget.SamplesPassed, queryObject);
             }
         }
     }

@@ -3,14 +3,14 @@
 
 using System;
 using System.IO;
+using System.Numerics;
 using osu.Framework.Extensions.EnumExtensions;
 using osu.Framework.Graphics.Batches;
 using osu.Framework.Graphics.OpenGL.Textures;
 using osu.Framework.Graphics.Primitives;
-using osuTK;
-using osuTK.Graphics.ES30;
 using osu.Framework.Graphics.Colour;
 using osu.Framework.Graphics.OpenGL.Vertices;
+using Silk.NET.OpenGL;
 using RectangleF = osu.Framework.Graphics.Primitives.RectangleF;
 
 namespace osu.Framework.Graphics.Textures
@@ -56,7 +56,7 @@ namespace osu.Framework.Graphics.Textures
             TextureGL = textureGl ?? throw new ArgumentNullException(nameof(textureGl));
         }
 
-        public Texture(int width, int height, bool manualMipmaps = false, All filteringMode = All.Linear)
+        public Texture(int width, int height, bool manualMipmaps = false, GLEnum filteringMode = GLEnum.Linear)
             : this(new TextureGLSingle(width, height, manualMipmaps, filteringMode))
         {
         }

@@ -23,7 +23,7 @@ namespace osu.Framework.Graphics.Containers
 
         /// <summary>
         /// Initialises a <see cref="SafeAreaDefiningContainer"/> by optionally providing a custom <see cref="BindableSafeArea"/>.
-        /// If no such binding is provided, the container will default to <see cref="OsuTKWindow.SafeAreaPadding"/>.
+        /// If no such binding is provided, the container will default.
         /// </summary>
         /// <param name="safeArea">The custom <see cref="BindableSafeArea"/> to bind to, if required.</param>
         public SafeAreaDefiningContainer(BindableSafeArea safeArea = null)

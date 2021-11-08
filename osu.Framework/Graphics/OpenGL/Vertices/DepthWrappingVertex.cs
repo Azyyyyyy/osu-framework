@@ -3,7 +3,7 @@
 
 using System;
 using System.Runtime.InteropServices;
-using osuTK.Graphics.ES30;
+using Silk.NET.OpenGL;
 
 namespace osu.Framework.Graphics.OpenGL.Vertices
 {

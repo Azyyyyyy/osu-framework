@@ -2,11 +2,13 @@
 // See the LICENCE file in the repository root for full licence text.
 
 using System;
+using System.Numerics;
 using osu.Framework.Graphics.Primitives;
 using osu.Framework.Graphics.Textures;
-using osuTK;
 using osu.Framework.Graphics.Shaders;
 using osu.Framework.Allocation;
+using osu.Framework.Extensions;
+using osu.Framework.Extensions.MatrixExtensions;
 using osu.Framework.Layout;
 using osu.Framework.Graphics.OpenGL.Textures;
 
@@ -191,7 +193,7 @@ namespace osu.Framework.Graphics.Sprites
             if (EdgeSmoothness == Vector2.Zero)
                 return Vector2.Zero;
 
-            return DrawInfo.MatrixInverse.ExtractScale().Xy * EdgeSmoothness;
+            return DrawInfo.MatrixInverse.XY() * EdgeSmoothness;
         }
 
         protected override Quad ComputeScreenSpaceDrawQuad()
@@ -250,7 +252,7 @@ namespace osu.Framework.Graphics.Sprites
                 rectangle.Height = DrawHeight;
             }
 
-            Vector2 shrinkageAmount = Vector2.ComponentMin(scale.Xy, rectangle.Size / 2);
+            Vector2 shrinkageAmount = Vector2Extensions.ComponentMax(scale.XY(), rectangle.Size / 2);
 
             return ToScreenSpace(rectangle.Inflate(-shrinkageAmount));
         }

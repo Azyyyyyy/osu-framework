@@ -6,7 +6,7 @@ using System.Diagnostics;
 using System.Threading;
 using JetBrains.Annotations;
 using osu.Framework.IO.Stores;
-using osuTK.Graphics.ES30;
+using Silk.NET.OpenGL;
 
 namespace osu.Framework.Graphics.Textures
 {
@@ -18,7 +18,7 @@ namespace osu.Framework.Graphics.Textures
         private readonly object referenceCountLock = new object();
         private readonly Dictionary<string, TextureWithRefCount.ReferenceCount> referenceCounts = new Dictionary<string, TextureWithRefCount.ReferenceCount>();
 
-        public LargeTextureStore(IResourceStore<TextureUpload> store = null, All filteringMode = All.Linear)
+        public LargeTextureStore(IResourceStore<TextureUpload> store = null, GLEnum filteringMode = GLEnum.Linear)
             : base(store, false, filteringMode, true)
         {
         }

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Linq;
+using System.Numerics;
 using osu.Framework.Allocation;
 using osu.Framework.Extensions.ListExtensions;
 using osu.Framework.Extensions.TypeExtensions;
@@ -20,8 +21,7 @@ using osu.Framework.Lists;
 using osu.Framework.Logging;
 using osu.Framework.Platform;
 using osu.Framework.Statistics;
-using osuTK;
-using osuTK.Input;
+using Silk.NET.Input;
 using JoystickState = osu.Framework.Input.States.JoystickState;
 using KeyboardState = osu.Framework.Input.States.KeyboardState;
 using MouseState = osu.Framework.Input.States.MouseState;
@@ -668,10 +668,10 @@ namespace osu.Framework.Input
         }
 
         private bool isModifierKey(Key k) =>
-            k == Key.LControl || k == Key.RControl
-                              || k == Key.LAlt || k == Key.RAlt
-                              || k == Key.LShift || k == Key.RShift
-                              || k == Key.LWin || k == Key.RWin;
+            k == Key.ControlLeft || k == Key.ControlRight
+                                 || k == Key.AltLeft || k == Key.AltRight
+                                 || k == Key.ShiftLeft || k == Key.ShiftRight
+                                 || k == Key.SuperLeft || k == Key.SuperRight;
 
         protected virtual void HandleKeyboardKeyStateChange(ButtonStateChangeEvent<Key> keyboardKeyStateChange)
         {
