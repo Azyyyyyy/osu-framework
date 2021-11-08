@@ -699,6 +699,7 @@ namespace osu.Framework.Platform
         {
             switch ((EventType)evtDrop.Type)
             {
+                //TODO: See if that works
                 case EventType.Dropfile:
                     string str = "";
                     sdl.Utf8strlcpy(str, evtDrop.File, 1);

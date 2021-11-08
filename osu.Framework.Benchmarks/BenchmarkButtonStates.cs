@@ -3,7 +3,7 @@
 
 using BenchmarkDotNet.Attributes;
 using osu.Framework.Input.States;
-using osuTK.Input;
+using Silk.NET.Input;
 
 namespace osu.Framework.Benchmarks
 {
@@ -21,7 +21,7 @@ namespace osu.Framework.Benchmarks
         public bool SetPressed()
         {
             var states = new ButtonStates<MouseButton>();
-            states.SetPressed(MouseButton.Button1, true);
+            states.SetPressed(MouseButton.Left, true);
             return states.HasAnyButtonPressed;
         }
 

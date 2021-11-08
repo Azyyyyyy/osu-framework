@@ -68,9 +68,12 @@ namespace osu.Framework.Extensions.MatrixExtensions
             int[] rowIdx = { 0, 0, 0 };
             int[] pivotIdx = { -1, -1, -1 };
 
-            float[,] inverse = {{mat.Row1.X, mat.Row1.Y, mat.Row1.Z},
-                {mat.Row2.X, mat.Row2.Y, mat.Row2.Z},
-                {mat.Row3.X, mat.Row3.Y, mat.Row3.Z}};
+            float[,] inverse =
+            {
+                { mat.Row1.X, mat.Row1.Y, mat.Row1.Z },
+                { mat.Row2.X, mat.Row2.Y, mat.Row2.Z },
+                { mat.Row3.X, mat.Row3.Y, mat.Row3.Z }
+            };
 
             int icol = 0;
             int irow = 0;
@@ -87,7 +90,7 @@ namespace osu.Framework.Extensions.MatrixExtensions
                     {
                         if (pivotIdx[k] == -1)
                         {
-                            float absVal = System.Math.Abs(inverse[j, k]);
+                            float absVal = Math.Abs(inverse[j, k]);
                             if (!(absVal > maxPivot)) continue;
 
                             maxPivot = absVal;
@@ -285,7 +288,7 @@ namespace osu.Framework.Extensions.MatrixExtensions
             m.M31 = m31;
         }
 
-        public static Vector2 XY(this Matrix3X3<float> m) => new Vector2(m.Column1.Length, m.Column2.Length);
+        public static Vector2 Xy(this Matrix3X3<float> m) => new Vector2(m.Column1.Length, m.Column2.Length);
 
         public static Vector3 ExtractScale(this Matrix3X3<float> m) => new Vector3(m.Column1.Length, m.Column2.Length, m.Column3.Length);
 

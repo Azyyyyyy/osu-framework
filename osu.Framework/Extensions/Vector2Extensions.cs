@@ -58,7 +58,7 @@ namespace osu.Framework.Extensions
             return a;
         }
 
-        public static Vector2 XY(this Vector3 vector3) => new Vector2(vector3.X, vector3.Y);
+        public static Vector2 Xy(this Vector3 vector3) => new Vector2(vector3.X, vector3.Y);
 
         /// <summary>
         /// Returns a copy of the Vector2 scaled to unit length.

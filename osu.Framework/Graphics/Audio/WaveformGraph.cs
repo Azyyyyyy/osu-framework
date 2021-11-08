@@ -305,7 +305,7 @@ namespace osu.Framework.Graphics.Audio
                 shader.Bind();
                 texture.TextureGL.Bind();
 
-                Vector2 localInflationAmount = new Vector2(0, 1) * DrawInfo.MatrixInverse.XY();
+                Vector2 localInflationAmount = new Vector2(0, 1) * DrawInfo.MatrixInverse.Xy();
 
                 // We're dealing with a _large_ number of points, so we need to optimise the quadToDraw * drawInfo.Matrix multiplications below
                 // for points that are going to be masked out anyway. This allows for higher resolution graphs at larger scales with virtually no performance loss.

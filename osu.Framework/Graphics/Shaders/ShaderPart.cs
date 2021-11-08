@@ -124,7 +124,7 @@ namespace osu.Framework.Graphics.Shaders
             }
         }
 
-        internal unsafe bool Compile()
+        internal bool Compile()
         {
             if (!HasCode)
                 return false;

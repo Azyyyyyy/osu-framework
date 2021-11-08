@@ -959,17 +959,17 @@ namespace osu.Framework.Graphics.OpenGL
 
                 case IUniformWithValue<Matrix2X2<float>> m2:
                     var m2R = m2.GetValueByRef();
-                    GL.UniformMatrix2(uniform.Location, false, new [] { m2R.Column1.Length, m2R.Column2.Length });
+                    GL.UniformMatrix2(uniform.Location, false, new[] { m2R.Column1.Length, m2R.Column2.Length });
                     break;
 
                 case IUniformWithValue<Matrix3X3<float>> m3:
                     var m3R = m3.GetValueByRef();
-                    GL.UniformMatrix3(uniform.Location, false, new [] { m3R.Column1.Length, m3R.Column2.Length, m3R.Column3.Length });
+                    GL.UniformMatrix3(uniform.Location, false, new[] { m3R.Column1.Length, m3R.Column2.Length, m3R.Column3.Length });
                     break;
 
                 case IUniformWithValue<Matrix4X4<float>> m4:
                     var m4R = m4.GetValueByRef();
-                    GL.UniformMatrix4(uniform.Location, false, new [] { m4R.Column1.Length, m4R.Column2.Length, m4R.Column3.Length, m4R.Column4.Length });
+                    GL.UniformMatrix4(uniform.Location, false, new[] { m4R.Column1.Length, m4R.Column2.Length, m4R.Column3.Length, m4R.Column4.Length });
                     break;
             }
         }

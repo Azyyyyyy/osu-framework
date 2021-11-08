@@ -520,7 +520,7 @@ namespace osu.Framework.Graphics.Sprites
 
             screenSpaceCharactersBacking.Clear();
 
-            Vector2 inflationAmount = DrawInfo.MatrixInverse.XY();
+            Vector2 inflationAmount = DrawInfo.MatrixInverse.Xy();
 
             foreach (var character in characters)
             {

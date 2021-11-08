@@ -71,10 +71,9 @@ namespace osu.Framework.Graphics.OpenGL.Buffers
                 case InternalFormat.StencilIndex8:
                     return FramebufferAttachment.StencilAttachment;
 
-                //TODO: Find out if this is missing in Silk.NET or if I'm doing a dumb
-                //case RenderbufferInternalFormat.Depth24Stencil8:
-                //case RenderbufferInternalFormat.Depth32fStencil8:
-                //    return FramebufferAttachment.DepthStencilAttachment;
+                case InternalFormat.Depth24Stencil8:
+                case InternalFormat.Depth32fStencil8:
+                    return FramebufferAttachment.DepthStencilAttachment;
 
                 default:
                     throw new InvalidOperationException($"{format} is not a valid {nameof(InternalFormat)} type.");

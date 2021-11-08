@@ -39,7 +39,7 @@ namespace osu.Framework.Graphics.OpenGL.Buffers
             Debug.Assert(amountIndices <= ushort.MaxValue);
         }
 
-        protected override unsafe void Initialise()
+        protected override void Initialise()
         {
             base.Initialise();
 

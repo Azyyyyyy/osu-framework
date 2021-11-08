@@ -33,7 +33,7 @@ namespace osu.Framework.Graphics.OpenGL.Buffers
             Type = type;
         }
 
-        protected override unsafe void Initialise()
+        protected override void Initialise()
         {
             base.Initialise();
 

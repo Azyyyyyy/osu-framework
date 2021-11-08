@@ -193,7 +193,7 @@ namespace osu.Framework.Graphics.Sprites
             if (EdgeSmoothness == Vector2.Zero)
                 return Vector2.Zero;
 
-            return DrawInfo.MatrixInverse.XY() * EdgeSmoothness;
+            return DrawInfo.MatrixInverse.Xy() * EdgeSmoothness;
         }
 
         protected override Quad ComputeScreenSpaceDrawQuad()
@@ -252,7 +252,7 @@ namespace osu.Framework.Graphics.Sprites
                 rectangle.Height = DrawHeight;
             }
 
-            Vector2 shrinkageAmount = Vector2Extensions.ComponentMax(scale.XY(), rectangle.Size / 2);
+            Vector2 shrinkageAmount = Vector2Extensions.ComponentMax(scale.Xy(), rectangle.Size / 2);
 
             return ToScreenSpace(rectangle.Inflate(-shrinkageAmount));
         }

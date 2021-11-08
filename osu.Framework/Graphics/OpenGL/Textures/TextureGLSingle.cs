@@ -529,7 +529,7 @@ namespace osu.Framework.Graphics.OpenGL.Textures
             }
         }
 
-        private unsafe void initializeLevel(int level, int width, int height)
+        private void initializeLevel(int level, int width, int height)
         {
             using (var image = createBackingImage(width, height))
             using (var pixels = image.CreateReadOnlyPixelSpan())
